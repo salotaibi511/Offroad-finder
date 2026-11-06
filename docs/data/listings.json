@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-06T19:53:07Z",
+ "updated_at": "2026-11-06T19:53:34Z",
  "listings": [
   {
    "id": "haraj:11192067493",
@@ -8116,6 +8116,13 @@
   }
  },
  "runs": [
+  {
+   "trigger": "rescore",
+   "at": "2026-11-06T19:53:34Z",
+   "added": 0,
+   "updated": 0,
+   "notified": 0
+  },
   {
    "trigger": "rescore",
    "at": "2026-11-06T19:53:07Z",
