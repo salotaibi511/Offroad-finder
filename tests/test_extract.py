@@ -102,3 +102,39 @@ def test_real_data_regressions():
                  "category": "حراج السيارات / جي ام سي / يوكن / يوكن 2020"}, CFG)
     s = score(f, CFG, {})
     assert s["label"] == "مستبعد" and s["score"] <= 35
+
+
+def test_web_edits_and_hiding(tmp_path, monkeypatch):
+    import json
+    from finder import store
+    from finder.pipeline import Pipeline
+    from finder.web import process_pending, record_hidden
+    monkeypatch.setattr(store, "DATA", str(tmp_path / "listings.json"))
+    monkeypatch.setattr(store, "EDITS", str(tmp_path / "edits.json"))
+    (tmp_path / "edits.json").write_text(json.dumps({
+        "pending": [{"sid": "s1", "url": "https://haraj.com.sa/111/x/", "by": "ali", "note": "شفتها"},
+                    {"sid": "s2", "url": "https://haraj.com.sa/222/x/", "by": "ali"}],
+        "overrides": {"haraj:111": {"fields": {"price": 15000, "city": "مكة"}, "status": "تواصلت",
+                                    "notes": [{"by": "ali", "date": "2026-11-07", "text": "ممتازة"}]}}},
+        ensure_ascii=False), encoding="utf-8")
+    p = Pipeline()
+    ads = {"https://haraj.com.sa/111/x/": {"id": "haraj:111", "source": "haraj", "url": "u1",
+                                            "title": "شاص 2002", "body": "دبل", "city": "جدة", "year": 2002},
+           "https://haraj.com.sa/222/x/": {"id": "haraj:222", "source": "haraj", "url": "u2",
+                                            "title": "طبق باترول للبر", "body": "", "city": "جدة"}}
+    p.expand = lambda u: [u]
+    p.fetch = lambda u: ads[u]
+    process_pending(p)
+    p.finish({"trigger": "test"})
+    record_hidden(p)
+    store.save(p.db)
+    db = store.load()
+    ids = [L["id"] for L in db["listings"]]
+    assert ids == ["haraj:111"] and "haraj:222" in db["ignored"]
+    L = db["listings"][0]
+    assert L["price"] == 15000 and L["city"] == "مكة" and L["distance_km"] == 80 and L["status"] == "تواصلت"
+    assert L["web_notes"][0]["text"] == "ممتازة" and L["added_by"] == "ali"
+    assert db["submissions"]["s2"]["hidden"] and db["submissions"]["s1"]["ids"] == ["haraj:111"]
+    # processed submissions are not re-processed
+    p2 = Pipeline()
+    assert process_pending(p2) == []

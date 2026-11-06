@@ -1,19 +1,22 @@
-// رادار سيارة البر — واجهة العرض (تقرأ data/listings.json)
+// رادار سيارة البر — واجهة العرض
 const LABELS = { "فرصة": "good", "يستحق السؤال": "mid", "ضعيف": "weak", "مستبعد": "bad", "مغلق": "bad" };
 const STATUSES = ["جديد", "تواصلت", "بانتظار رد", "معاينة", "فحص", "تفاوض", "مستبعد يدويًا", "تم الشراء", "مباع"];
 const BREAK = { price_value: "السعر", model_fit: "الموديل", condition: "الحالة", mileage: "الممشى", year: "السنة", distance: "المسافة" };
 
-// owner/repo: من رابط GitHub Pages تلقائيًا، أو عدّلها يدويًا هنا
 const REPO = (() => {
   const h = location.hostname, seg = location.pathname.split("/").filter(Boolean);
   if (h.endsWith(".github.io")) return `${h.split(".")[0]}/${seg[0] || h}`;
-  return window.REPO_OVERRIDE || "OWNER/REPO";
+  return window.REPO_OVERRIDE || "salotaibi511/Offroad-finder";
 })();
 const GH = `https://github.com/${REPO}`;
+const API = (window.API_URL || "").trim();
 
-let DB = { listings: [] }, activeLabels = new Set(["فرصة", "يستحق السؤال"]);
+let DB = { listings: [] }, EDITS = { pending: [], overrides: {} }, RAW = [];
+let activeLabels = new Set(["فرصة", "يستحق السؤال"]);
+let watching = { sids: new Set(), refresh: false, editAt: 0 };
+
 const $ = (s) => document.querySelector(s);
-const fmt = (n) => (n == null ? "؟" : Number(n).toLocaleString("en-US"));
+const fmt = (n) => (n == null || n === "" ? "؟" : Number(n).toLocaleString("en-US"));
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
 const ago = (iso) => {
   if (!iso) return "";
@@ -24,25 +27,96 @@ const ago = (iso) => {
   return `قبل ${Math.round(m / 1440)} يوم`;
 };
 const scoreColor = (s) => (s >= 70 ? "var(--good)" : s >= 50 ? "var(--mid)" : "var(--weak)");
+const store = {
+  get: (k) => { try { return localStorage.getItem(k) || ""; } catch (e) { return ""; } },
+  set: (k, v) => { try { localStorage.setItem(k, v); } catch (e) { /* ignore */ } },
+};
 
-async function load() {
-  $("#btn-add").href = `${GH}/issues/new?template=add-offer.yml`;
-  $("#btn-run").href = `${GH}/actions/workflows/collect.yml`;
-  $("#btn-config").href = `${GH}/edit/main/config.yaml`;
+/* ---------------- API bridge ---------------- */
+async function api(action, payload = {}, method = "POST") {
+  if (!API) throw new Error("no-api");
+  let r;
+  if (method === "GET") {
+    r = await fetch(`${API}?action=${action}&t=${Date.now()}`);
+  } else {
+    const body = { action, by: store.get("offroad_name") || "زائر", code: store.get("offroad_code"), ...payload };
+    r = await fetch(API, { method: "POST", body: JSON.stringify(body) }); // text/plain → no CORS preflight
+  }
+  const j = await r.json();
+  if (!j.ok && j.need_code) {
+    const c = prompt("هذا الموقع محمي برمز للتعديل. اكتب الرمز:");
+    if (c) { store.set("offroad_code", c); return api(action, payload, method); }
+  }
+  if (!j.ok) throw new Error(j.error || "خطأ");
+  return j;
+}
+
+function askName() {
+  let n = store.get("offroad_name");
+  if (!n) {
+    n = (prompt("اكتب اسمك (يظهر بجانب إضافاتك وملاحظاتك):") || "").trim().slice(0, 40);
+    if (n) store.set("offroad_name", n);
+  }
+  return n || "زائر";
+}
+
+/* ---------------- data ---------------- */
+function applyEdits() {
+  const ov = EDITS.overrides || {};
+  DB.listings = RAW.map((x) => {
+    const l = { ...x }, o = ov[l.id];
+    if (!o) return l;
+    Object.entries(o.fields || {}).forEach(([k, v]) => { if (v !== null && v !== "") l[k] = v; });
+    if ((o.fields || {}).price) l.price_type = "asking";
+    if ((o.fields || {}).model_key && DB.stats_names) l.model_name = DB.stats_names[o.fields.model_key] || l.model_name;
+    if (o.status) l.status = o.status;
+    if (o.notes) l.web_notes = o.notes;
+    if (o.hidden) l._hidden = true;
+    if (Object.keys(o.fields || {}).length) l.edited = { by: o.by, at: o.at };
+    return l;
+  }).filter((l) => !l._hidden);
+}
+
+async function fetchData() {
+  if (API) {
+    try {
+      const j = await api("data", {}, "GET");
+      if (j.data && j.data.listings) DB = j.data;
+      EDITS = j.edits || EDITS;
+      return;
+    } catch (e) { console.warn("bridge failed, falling back", e); }
+  }
   try {
     const r = await fetch(`data/listings.json?t=${Date.now()}`);
     if (r.ok) DB = await r.json();
-  } catch (e) { /* empty state */ }
-  $("#updated").textContent = DB.updated_at ? `آخر تحديث ${ago(DB.updated_at)} · ${DB.listings.length} عرض` : "لا توجد بيانات بعد — شغّل البحث أو أضف عرضًا";
-  initFilters();
+    const e = await fetch(`data/edits.json?t=${Date.now()}`);
+    if (e.ok) EDITS = await e.json();
+  } catch (e) { /* empty */ }
+}
+
+async function load(first = false) {
+  await fetchData();
+  RAW = DB.listings || [];
+  applyEdits();
+  $("#updated").textContent = DB.updated_at ? `آخر تحديث ${ago(DB.updated_at)} · ${DB.listings.length} عرض` : "لا توجد بيانات بعد";
+  if (first) initFilters(); else refreshFilterOptions();
   render();
+  checkWatches();
+}
+
+/* ---------------- filters ---------------- */
+function refreshFilterOptions() {
+  const keep = (sel, opts, first) => {
+    const v = $(sel).value;
+    $(sel).innerHTML = `<option value="">${first}</option>` + opts.map((m) => `<option>${esc(m)}</option>`).join("");
+    $(sel).value = v;
+  };
+  keep("#f-model", [...new Set(DB.listings.map((l) => l.model_name).filter(Boolean))].sort(), "كل الموديلات");
+  keep("#f-region", [...new Set(DB.listings.map((l) => l.region).filter(Boolean))].sort(), "كل المناطق");
 }
 
 function initFilters() {
-  const models = [...new Set(DB.listings.map((l) => l.model_name).filter(Boolean))].sort();
-  $("#f-model").innerHTML = `<option value="">كل الموديلات</option>` + models.map((m) => `<option>${esc(m)}</option>`).join("");
-  const regions = [...new Set(DB.listings.map((l) => l.region).filter(Boolean))].sort();
-  $("#f-region").innerHTML = `<option value="">كل المناطق</option>` + regions.map((m) => `<option>${esc(m)}</option>`).join("");
+  refreshFilterOptions();
   $("#f-status").innerHTML = `<option value="">كل الحالات</option>` + STATUSES.map((s) => `<option>${s}</option>`).join("");
   ["#f-q", "#f-model", "#f-region", "#f-dist", "#f-status", "#f-sort", "#f-all"].forEach((s) => $(s).addEventListener("input", render));
   const chips = Object.keys(LABELS).filter((l) => l !== "مغلق");
@@ -56,13 +130,21 @@ function initFilters() {
     document.querySelectorAll(".tab,.panel").forEach((x) => x.classList.remove("active"));
     t.classList.add("active"); $("#" + t.dataset.tab).classList.add("active");
   }));
+  // header buttons
+  if (API) {
+    $("#btn-add").removeAttribute("href"); $("#btn-add").onclick = openAdd;
+    $("#btn-run").removeAttribute("href"); $("#btn-run").onclick = runRefresh;
+  } else {
+    $("#btn-add").href = `${GH}/issues/new?template=add-offer.yml`;
+    $("#btn-run").href = `${GH}/actions/workflows/collect.yml`;
+  }
+  $("#btn-config").href = `${GH}/edit/main/config.yaml`;
 }
 
 function filtered() {
-  const q = $("#f-q").value.trim(), model = $("#f-model").value, dist = +$("#f-dist").value || 0;
-  const region = $("#f-region").value;
-  const st = $("#f-status").value, all = $("#f-all").checked, sort = $("#f-sort").value;
-  let xs = DB.listings.filter((l) => {
+  const q = $("#f-q").value.trim(), model = $("#f-model").value, region = $("#f-region").value;
+  const dist = +$("#f-dist").value || 0, st = $("#f-status").value, all = $("#f-all").checked, sort = $("#f-sort").value;
+  const xs = DB.listings.filter((l) => {
     if (!all && (l.archived || l.label === "مستبعد" || l.label === "مغلق")) return false;
     if (activeLabels.size && !activeLabels.has(l.label) && !(all && (l.label === "مستبعد" || l.label === "مغلق"))) return false;
     if (model && l.model_name !== model) return false;
@@ -82,6 +164,7 @@ function filtered() {
   return xs.sort(key);
 }
 
+/* ---------------- rendering ---------------- */
 function card(l) {
   const img = (l.images || [])[0];
   const cls = LABELS[l.label] || "weak";
@@ -92,10 +175,15 @@ function card(l) {
     ...(l.reasons_neg || []).slice(0, 3).map((r) => `<li class="neg">! ${esc(r)}</li>`),
   ].join("");
   const bars = Object.entries(l.breakdown || {}).map(([k, v]) => `<span>${BREAK[k] || k}</span><div class="bar"><i style="width:${v}%"></i></div>`).join("");
-  const notes = (l.notes || []).map((n) => `<div>📝 <b>${esc(n.by)}</b> (${esc(n.date)}): ${esc(n.text)}</div>`).join("");
+  const notes = [...(l.notes || []), ...(l.web_notes || [])].map((n) => `<div>📝 <b>${esc(n.by)}</b> (${esc(n.date)}): ${esc(n.text)}</div>`).join("");
   const ph = (l.price_history || []).length > 1 ? `<div class="meta">تاريخ السعر: ${l.price_history.map((p) => fmt(p.price)).join(" ← ")}</div>` : "";
-  const statusUrl = `${GH}/issues/new?template=update-status.yml&title=${encodeURIComponent("تحديث: " + (l.title || "").slice(0, 40))}&offer_id=${encodeURIComponent(l.id)}`;
-  return `<article class="card ${l.archived || cls === "bad" ? "dim" : ""}">
+  const statusCtl = API
+    ? `<select class="status-sel" data-status="${esc(l.id)}">${STATUSES.map((s) => `<option ${s === l.status ? "selected" : ""}>${s}</option>`).join("")}</select>`
+    : `<span class="status">${esc(l.status)}</span>`;
+  const editBtn = API
+    ? `<button class="btn sm" data-edit="${esc(l.id)}">✏️ تعديل</button>`
+    : `<a class="btn sm" href="${GH}/issues/new?template=update-status.yml&offer_id=${encodeURIComponent(l.id)}" target="_blank">تحديث الحالة</a>`;
+  return `<article class="card ${l.archived || cls === "bad" ? "dim" : ""}" id="c-${esc(l.id).replace(/[^\w-]/g, "_")}">
     <div class="thumb" ${img ? `style="background-image:url('${esc(img)}')"` : ""}>${img ? "" : '<div class="noimg">🚙</div>'}
       <div class="score" style="background:${scoreColor(l.score)}">${l.score}</div>
       <span class="badge l-${cls}">${esc(l.label)}</span></div>
@@ -115,21 +203,27 @@ function card(l) {
       <details><summary>تفصيل الدرجة والوصف</summary><div class="bars">${bars}</div><p class="muted">${esc(l.body || "")}</p></details>
       ${ph}
       ${notes ? `<div class="notes">${notes}</div>` : ""}
-      <div class="meta"><span class="status">${esc(l.status)}</span><span>${esc(l.source)} · ${ago(l.first_seen)}${l.added_by && l.added_by !== "auto" ? " · أضافه " + esc(l.added_by) : ""}</span></div>
+      <div class="meta">${statusCtl}<span>${esc(l.source)} · ${ago(l.first_seen)}${l.added_by && l.added_by !== "auto" ? " · أضافه " + esc(String(l.added_by).replace("auto+", "")) : ""}${l.edited ? ` · ✏️ عدّله ${esc(l.edited.by)}` : ""}</span></div>
     </div>
     <div class="cardfoot">
       <a class="btn sm primary" href="${esc(l.url)}" target="_blank">فتح الإعلان</a>
-      <a class="btn sm" href="${statusUrl}" target="_blank">تحديث الحالة</a>
+      ${editBtn}
       <button class="btn sm" data-msg="${esc(l.id)}">رسالة للبائع</button>
-      <button class="btn sm" data-copy="${esc(l.id)}" title="نسخ رقم العرض">#</button>
     </div></article>`;
+}
+
+function pendingCards() {
+  const done = DB.submissions || {};
+  const ps = (EDITS.pending || []).filter((p) => !done[p.sid] && Date.now() - new Date(p.at) < 2 * 3600e3);
+  return ps.map((p) => `<article class="card pending"><div class="body"><h3 class="title">⏳ جارِ إضافة العرض…</h3>
+      <p class="muted" style="word-break:break-all">${esc(p.url)}</p><p class="muted">أضافه ${esc(p.by)} · ${ago(p.at)} — يظهر هنا خلال دقيقة إلى دقيقتين</p></div></article>`).join("");
 }
 
 function render() {
   const xs = filtered();
-  $("#list").innerHTML = xs.map(card).join("");
+  $("#list").innerHTML = pendingCards() + xs.map(card).join("");
   $("#empty").classList.toggle("hidden", xs.length > 0);
-  $("#empty").textContent = DB.listings.length ? "لا توجد عروض مطابقة للفلاتر." : "لا توجد عروض بعد. اضغط «بحث الآن» أو «أضف عرض».";
+  $("#empty").textContent = DB.listings.length ? "لا توجد عروض مطابقة للفلاتر." : "لا توجد عروض بعد. اضغط «تحديث» أو «أضف عرض».";
   renderTiles(); renderBoard(); renderMarket();
 }
 
@@ -140,7 +234,7 @@ function renderTiles() {
     ["🟢 فرص", c((l) => l.label === "فرصة"), "فرصة"],
     ["🟡 تستحق السؤال", c((l) => l.label === "يستحق السؤال"), "يستحق السؤال"],
     ["⚪ ضعيفة", c((l) => l.label === "ضعيف"), "ضعيف"],
-    ["⛔ مستبعدة", c((l) => l.label === "مستبعد"), "مستبعد"],
+    ["⛔ خارج المواصفات", c((l) => l.label === "مستبعد"), "مستبعد"],
     ["📌 قيد المتابعة", c((l) => !["جديد", "مستبعد يدويًا"].includes(l.status)), null],
     ["🆕 آخر 24 ساعة", c((l) => Date.now() - new Date(l.first_seen) < 864e5), null],
   ];
@@ -158,7 +252,10 @@ function renderBoard() {
   const cols = STATUSES.filter((s) => s !== "جديد");
   $("#board").innerHTML = cols.map((s) => {
     const xs = DB.listings.filter((l) => l.status === s);
-    return `<div class="col"><h4>${s} (${xs.length})</h4>${xs.map((l) => `<div class="mini"><b>${l.score}</b> · <a href="${esc(l.url)}" target="_blank">${esc(l.title)}</a><br>${l.price ? fmt(l.price) + " ريال" : ""} ${esc(l.city || "")}${(l.notes || []).length ? `<br>📝 ${esc(l.notes.at(-1).text)}` : ""}</div>`).join("") || '<p class="muted">—</p>'}</div>`;
+    return `<div class="col"><h4>${s} (${xs.length})</h4>${xs.map((l) => {
+      const n = [...(l.notes || []), ...(l.web_notes || [])].at(-1);
+      return `<div class="mini"><b>${l.score}</b> · <a href="${esc(l.url)}" target="_blank">${esc(l.title)}</a><br>${l.price ? fmt(l.price) + " ريال" : ""} ${esc(l.city || "")}${n ? `<br>📝 ${esc(n.text)}` : ""}</div>`;
+    }).join("") || '<p class="muted">—</p>'}</div>`;
   }).join("");
 }
 
@@ -167,10 +264,150 @@ function renderMarket() {
   const rows = Object.entries(s).sort((a, b) => b[1].n - a[1].n);
   $("#market-tbl").innerHTML = `<tr><th>الموديل</th><th>عدد العروض المسعّرة</th><th>متوسط السعر (الوسيط)</th></tr>` +
     (rows.map(([k, v]) => `<tr><td>${esc(names[k] || k)}</td><td>${v.n}</td><td>${fmt(v.median)} ريال</td></tr>`).join("") || `<tr><td colspan="3" class="muted">لا تكفي البيانات بعد</td></tr>`);
-  $("#runs-tbl").innerHTML = `<tr><th>الوقت</th><th>النوع</th><th>جديد</th><th>محدّث</th><th>تنبيهات</th><th>أخطاء</th></tr>` +
-    (DB.runs || []).map((r) => `<tr><td>${ago(r.at)}</td><td>${r.trigger === "issue" ? "إضافة يدوية (" + esc(r.by) + ")" : r.trigger === "rescore" ? "إعادة تقييم" : "بحث تلقائي"}</td><td>${r.added ?? ""}</td><td>${r.updated ?? ""}</td><td>${r.notified ?? ""}</td><td>${r.errors ?? ""}</td></tr>`).join("");
+  const kind = (r) => r.trigger === "issue" || r.trigger === "web" ? "من الموقع" + (r.by ? ` (${esc(r.by)})` : "") : r.trigger === "rescore" ? "إعادة تقييم" : "بحث تلقائي";
+  $("#runs-tbl").innerHTML = `<tr><th>الوقت</th><th>النوع</th><th>جديد</th><th>محدّث</th><th>تنبيهات</th></tr>` +
+    (DB.runs || []).map((r) => `<tr><td>${ago(r.at)}</td><td>${kind(r)}</td><td>${r.added ?? ""}</td><td>${r.updated ?? ""}</td><td>${r.notified ?? ""}</td></tr>`).join("");
 }
 
+/* ---------------- toasts & banner ---------------- */
+function toast(msg, kind = "") {
+  const t = document.createElement("div");
+  t.className = `toast ${kind}`; t.textContent = msg;
+  $("#toasts").appendChild(t);
+  setTimeout(() => t.remove(), 6000);
+}
+function banner(msg) {
+  $("#banner").classList.toggle("hidden", !msg);
+  $("#banner").innerHTML = msg ? `<span class="spin"></span> ${msg}` : "";
+}
+
+/* ---------------- add ---------------- */
+function openAdd() {
+  askName();
+  $("#add-urls").value = ""; $("#add-note").value = "";
+  $("#add-dlg").showModal();
+}
+async function submitAdd(e) {
+  e.preventDefault();
+  const urls = $("#add-urls").value.trim();
+  if (!/https?:\/\//.test(urls)) { toast("الصق رابطًا صحيحًا يبدأ بـ https://", "err"); return; }
+  $("#add-save").disabled = true;
+  try {
+    const j = await api("add", { urls, note: $("#add-note").value.trim() });
+    $("#add-dlg").close();
+    j.added.forEach((a) => { watching.sids.add(a.sid); EDITS.pending.push({ sid: a.sid, url: a.url, by: store.get("offroad_name"), at: new Date().toISOString() }); });
+    render();
+    toast("✓ استلمت الرابط — يظهر العرض مع تقييمه خلال دقيقة إلى دقيقتين", "ok");
+    startPolling();
+  } catch (err) { toast("تعذر الإرسال: " + err.message, "err"); }
+  finally { $("#add-save").disabled = false; }
+}
+
+/* ---------------- edit ---------------- */
+let editing = null;
+function openEdit(id) {
+  const l = DB.listings.find((x) => x.id === id); if (!l) return;
+  askName();
+  editing = l;
+  $("#e-title").value = l.title || "";
+  $("#e-price").value = l.price || "";
+  $("#e-year").value = l.year || "";
+  $("#e-km").value = l.mileage_km || "";
+  $("#e-city").value = l.city || "";
+  const names = DB.stats_names || {};
+  $("#e-model").innerHTML = `<option value="">— كما هو —</option>` + Object.entries(names).map(([k, n]) => `<option value="${k}" ${k === l.model_key ? "selected" : ""}>${esc(n)}</option>`).join("");
+  $("#e-4x4").value = l.is_4x4 === true ? "true" : l.is_4x4 === false ? "false" : "";
+  $("#e-trans").value = l.transmission || "";
+  $("#e-status").innerHTML = STATUSES.map((s) => `<option ${s === l.status ? "selected" : ""}>${s}</option>`).join("");
+  $("#e-note").value = "";
+  $("#e-hide").checked = false;
+  $("#edit-dlg").showModal();
+}
+async function submitEdit(e) {
+  e.preventDefault();
+  const l = editing; if (!l) return;
+  const f = {};
+  const set = (k, v, old) => { if (String(v ?? "") !== String(old ?? "")) f[k] = v; };
+  set("title", $("#e-title").value.trim(), l.title);
+  set("price", $("#e-price").value, l.price || "");
+  set("year", $("#e-year").value, l.year || "");
+  set("mileage_km", $("#e-km").value, l.mileage_km || "");
+  set("city", $("#e-city").value.trim(), l.city || "");
+  if ($("#e-model").value) set("model_key", $("#e-model").value, l.model_key);
+  if ($("#e-4x4").value) set("is_4x4", $("#e-4x4").value === "true", l.is_4x4);
+  if ($("#e-trans").value) set("transmission", $("#e-trans").value, l.transmission);
+  const payload = { id: l.id, fields: f };
+  if ($("#e-status").value !== l.status) payload.status = $("#e-status").value;
+  if ($("#e-note").value.trim()) payload.note = $("#e-note").value.trim();
+  if ($("#e-hide").checked) payload.hidden = true;
+  if (!Object.keys(f).length && !payload.status && !payload.note && !payload.hidden) { $("#edit-dlg").close(); return; }
+  $("#e-save").disabled = true;
+  try {
+    const j = await api("edit", payload);
+    EDITS.overrides[l.id] = j.override;
+    applyEdits(); render();
+    $("#edit-dlg").close();
+    toast(Object.keys(f).length ? "✓ تم الحفظ — يُعاد حساب التقييم خلال دقيقة" : "✓ تم الحفظ", "ok");
+    if (Object.keys(f).length) { watching.editAt = Date.now(); startPolling(); }
+  } catch (err) { toast("تعذر الحفظ: " + err.message, "err"); }
+  finally { $("#e-save").disabled = false; }
+}
+async function quickStatus(id, status) {
+  askName();
+  try {
+    const j = await api("edit", { id, status });
+    EDITS.overrides[id] = j.override;
+    applyEdits(); render();
+    toast(`✓ الحالة: ${status}`, "ok");
+  } catch (err) { toast("تعذر الحفظ: " + err.message, "err"); render(); }
+}
+
+/* ---------------- refresh (search now) ---------------- */
+async function runRefresh() {
+  try {
+    await api("refresh");
+    watching.refresh = Date.now();
+    banner("جارِ البحث في حراج الآن… يستغرق عادة 5 إلى 10 دقائق، والصفحة تتحدث وحدها");
+    startPolling();
+  } catch (err) { toast("تعذر بدء البحث: " + err.message, "err"); }
+}
+
+/* ---------------- polling ---------------- */
+let pollTimer = null;
+function startPolling() {
+  if (pollTimer) return;
+  pollTimer = setInterval(async () => {
+    if (watching.refresh) {
+      try {
+        const j = await api("status", {}, "GET");
+        const run = (j.runs || []).find((r) => /collect\.yml$/.test(r.path) && new Date(r.created_at) >= watching.refresh - 120e3);
+        if (run && run.status !== "completed") banner(`جارِ البحث في حراج… (${run.status === "queued" ? "في الانتظار" : "يعمل الآن"} منذ ${ago(run.created_at).replace("قبل ", "")})`);
+        if (run && run.status === "completed") {
+          watching.refresh = false; banner("");
+          toast(run.conclusion === "success" ? "✓ اكتمل البحث وتحدّثت العروض" : "⚠️ انتهى البحث بخطأ — جرّب لاحقًا", run.conclusion === "success" ? "ok" : "err");
+          await load();
+        }
+      } catch (e) { /* keep polling */ }
+    }
+    if (watching.sids.size || (watching.editAt && Date.now() - watching.editAt < 5 * 60e3)) await load();
+    if (!watching.refresh && !watching.sids.size && !(watching.editAt && Date.now() - watching.editAt < 5 * 60e3)) {
+      clearInterval(pollTimer); pollTimer = null;
+    }
+  }, 20000);
+}
+function checkWatches() {
+  const subs = DB.submissions || {};
+  for (const sid of [...watching.sids]) {
+    const r = subs[sid]; if (!r) continue;
+    watching.sids.delete(sid);
+    if (r.error && !r.ids.length) toast(`⚠️ ${r.error}`, "err");
+    else if (r.hidden && r.hidden.length && !r.ids.length) toast(`لم يُضف: ${r.hidden[0]}`, "err");
+    else toast(`✓ أُضيف ${r.ids.length} عرض`, "ok");
+  }
+  if (watching.editAt && DB.updated_at && new Date(DB.updated_at) > watching.editAt) watching.editAt = 0;
+}
+
+/* ---------------- seller message ---------------- */
 function sellerMessage(l) {
   const ask = [];
   if (!l.price) ask.push("كم السعر المطلوب؟");
@@ -183,16 +420,22 @@ function sellerMessage(l) {
   return `السلام عليكم، بخصوص إعلانك: ${l.title}\n${l.url}\n\nودي أسأل:\n` + ask.map((q, i) => `${i + 1}. ${q}`).join("\n") + "\n\nوشكرًا لك.";
 }
 
+/* ---------------- events ---------------- */
 document.addEventListener("click", (e) => {
-  const id = e.target.dataset?.msg || e.target.dataset?.copy;
-  if (!id) return;
-  const l = DB.listings.find((x) => x.id === id);
-  if (e.target.dataset.copy) { navigator.clipboard?.writeText(id); e.target.textContent = "✓"; return; }
+  const t = e.target.closest("[data-msg],[data-edit]"); if (!t) return;
+  if (t.dataset.edit) return openEdit(t.dataset.edit);
+  const l = DB.listings.find((x) => x.id === t.dataset.msg);
   const txt = sellerMessage(l);
   $("#msg-text").value = txt;
   $("#msg-wa").href = `https://wa.me/?text=${encodeURIComponent(txt)}`;
   $("#msg-dlg").showModal();
 });
+document.addEventListener("change", (e) => {
+  if (e.target.matches(".status-sel")) quickStatus(e.target.dataset.status, e.target.value);
+});
 $("#msg-copy").onclick = () => { navigator.clipboard?.writeText($("#msg-text").value); $("#msg-copy").textContent = "تم النسخ ✓"; };
+$("#add-form").addEventListener("submit", submitAdd);
+$("#edit-form").addEventListener("submit", submitEdit);
+document.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => b.closest("dialog").close()));
 
-load();
+load(true);

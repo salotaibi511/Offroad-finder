@@ -19,11 +19,12 @@
   </div>
   <nav class="actions">
     <a id="btn-add" class="btn primary" target="_blank">➕ أضف عرض</a>
-    <a id="btn-run" class="btn" target="_blank">▶ بحث الآن</a>
+    <a id="btn-run" class="btn" target="_blank">🔄 تحديث</a>
     <a id="btn-config" class="btn" target="_blank">⚙ المواصفات</a>
   </nav>
 </header>
 
+<div id="banner" class="banner hidden"></div>
 <section class="tiles" id="tiles"></section>
 
 <div class="tabs" role="tablist">
@@ -70,9 +71,42 @@
 <dialog id="msg-dlg">
   <h3>رسالة جاهزة للبائع</h3>
   <textarea id="msg-text" rows="9"></textarea>
-  <div class="row"><button class="btn primary" id="msg-copy">نسخ</button><a class="btn" id="msg-wa" target="_blank">واتساب</a><button class="btn" onclick="this.closest('dialog').close()">إغلاق</button></div>
+  <div class="row"><button class="btn primary" id="msg-copy">نسخ</button><a class="btn" id="msg-wa" target="_blank">واتساب</a><button class="btn" type="button" data-close>إغلاق</button></div>
 </dialog>
 
+<dialog id="add-dlg">
+  <form id="add-form">
+    <h3>➕ أضف عرض</h3>
+    <label>رابط الإعلان (أو رابط صفحة بحث في حراج) — رابط في كل سطر
+      <textarea id="add-urls" rows="4" placeholder="https://haraj.com.sa/11192126812/..." required></textarea></label>
+    <label>ملاحظة (اختياري)<textarea id="add-note" rows="2"></textarea></label>
+    <p class="muted">يقرأ النظام الإعلان ويقيّمه ويظهر هنا خلال دقيقة إلى دقيقتين. قطع الغيار والإكسسوارات لا تُضاف.</p>
+    <div class="row"><button class="btn primary" id="add-save" type="submit">إضافة</button><button class="btn" type="button" data-close>إلغاء</button></div>
+  </form>
+</dialog>
+
+<dialog id="edit-dlg">
+  <form id="edit-form">
+    <h3>✏️ تعديل العرض</h3>
+    <div class="form-grid">
+      <label class="wide">العنوان<input id="e-title"></label>
+      <label>السعر (ريال)<input id="e-price" inputmode="numeric"></label>
+      <label>سنة الصنع<input id="e-year" inputmode="numeric"></label>
+      <label>الممشى (كم)<input id="e-km" inputmode="numeric"></label>
+      <label>المدينة<input id="e-city"></label>
+      <label>الموديل<select id="e-model"></select></label>
+      <label>دبل؟<select id="e-4x4"><option value="">— غير معروف —</option><option value="true">نعم دبل</option><option value="false">ليست دبل</option></select></label>
+      <label>القير<select id="e-trans"><option value="">— غير معروف —</option><option>أوتوماتيك</option><option>عادي</option></select></label>
+      <label>الحالة<select id="e-status"></select></label>
+      <label class="wide">إضافة ملاحظة<textarea id="e-note" rows="2" placeholder="مثال: كلمت البائع، يقبل 17 ألف"></textarea></label>
+      <label class="wide chk"><input type="checkbox" id="e-hide"> إخفاء هذا العرض نهائيًا (ليس سيارة / غير مناسب)</label>
+    </div>
+    <div class="row"><button class="btn primary" id="e-save" type="submit">حفظ</button><button class="btn" type="button" data-close>إلغاء</button></div>
+  </form>
+</dialog>
+
+<div id="toasts"></div>
+<script src="config.js"></script>
 <script src="app.js"></script>
 </body>
 </html>

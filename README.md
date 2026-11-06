@@ -66,3 +66,8 @@ python scripts/collect.py && git add docs/data && git commit -m "تحديث" && 
 - `finder/sources/` — حراج + محلل عام لأي موقع (Open Graph و JSON-LD)
 - `scripts/collect.py` · `scripts/issue_command.py` · `scripts/rescore.py`
 - `docs/` — الموقع
+
+## الإضافة والتعديل من الموقع مباشرة (بدون GitHub)
+
+الموقع يتصل بجسر مجاني على Google Apps Script (`bridge/Code.gs`) يحمل مفتاح GitHub بشكل خاص.
+بعد نشره ضع رابطه في `docs/config.js` (`window.API_URL = "..."`). بدونه تعمل الأزرار عبر GitHub كما كانت.

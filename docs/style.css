@@ -83,3 +83,18 @@ dialog textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line
 .row{display:flex;gap:8px;margin-top:10px}
 @media (max-width:600px){.top,.tiles,.tabs,.panel{padding-left:14px;padding-right:14px}}
 .spec.loc{background:#fbeee3;color:#8a4a1c;font-weight:500}
+
+.banner{margin:14px 28px 0;padding:10px 14px;border-radius:10px;background:#fff6dc;border:1px solid #f0d48a;font-size:14px;display:flex;align-items:center;gap:8px}
+.spin{width:14px;height:14px;border:2px solid #c99318;border-top-color:transparent;border-radius:50%;display:inline-block;animation:sp 1s linear infinite}
+@keyframes sp{to{transform:rotate(360deg)}}
+#toasts{position:fixed;bottom:18px;left:18px;display:flex;flex-direction:column;gap:8px;z-index:50}
+.toast{background:#2b2620;color:#fff;padding:10px 14px;border-radius:10px;font-size:14px;max-width:360px;box-shadow:0 4px 14px rgba(0,0,0,.2)}
+.toast.ok{background:var(--good)} .toast.err{background:var(--bad)}
+.card.pending{border-style:dashed;background:#fffaf0}
+.status-sel{font:inherit;font-size:12px;padding:1px 4px;border-radius:6px;border:1px solid var(--line);background:#efe7da}
+dialog label{display:flex;flex-direction:column;gap:4px;font-size:13px;color:var(--muted);margin-bottom:8px}
+dialog input,dialog select{font:inherit;padding:8px 10px;border:1px solid var(--line);border-radius:10px;color:var(--ink)}
+dialog h3{margin-top:0}
+.form-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
+.form-grid .wide{grid-column:1/-1}
+dialog label.chk{flex-direction:row;align-items:center;color:var(--ink)}

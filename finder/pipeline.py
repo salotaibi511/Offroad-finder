@@ -33,6 +33,49 @@ class Pipeline:
         self.idx = store.index(self.db)
         self.ai_budget = self.cfg.get("llm", {}).get("max_per_run", 40) if llm.available(self.cfg) else 0
         self.added, self.updated = [], []
+        self.edits = store.load_edits()
+        self.ignored = set(self.db.get("ignored", []))
+        self.hidden_now = []
+
+    # ---------- user edits from the website ----------
+    def apply_override(self, L: dict):
+        ov = self.edits["overrides"].get(L["id"])
+        if not ov:
+            return L
+        fields = ov.get("fields") or {}
+        for k in ("title", "price", "year", "mileage_km", "city", "is_4x4", "transmission", "fuel", "model_key"):
+            if k in fields and fields[k] not in ("", None):
+                L[k] = fields[k]
+        if "price" in fields and fields["price"]:
+            L["price"], L["price_type"] = int(fields["price"]), "asking"
+        if "model_key" in fields and fields["model_key"] in self.cfg["models"]:
+            L["model_name"] = self.cfg["models"][fields["model_key"]]["name"]
+        if "city" in fields and fields["city"]:
+            from .extract import CITY_KM, REGION
+            from .textnorm import norm
+            c = next((k for k in CITY_KM if norm(k) == norm(fields["city"])), fields["city"])
+            L["city"], L["distance_km"], L["region"] = c, CITY_KM.get(c), REGION.get(c)
+        if fields:
+            L["edited"] = {"by": ov.get("by"), "at": ov.get("at"), "fields": sorted(fields)}
+        if ov.get("status"):
+            L["status"] = ov["status"]
+        if ov.get("notes"):
+            L["web_notes"] = ov["notes"]
+        if ov.get("hidden"):
+            L["user_hidden"] = True
+        return L
+
+    def should_hide(self, L: dict):
+        if L.get("user_hidden"):
+            return "أُخفي من الموقع"
+        if L.get("non_car"):
+            return f"ليس سيارة ({L['non_car']})"
+        if L.get("parts_car"):
+            return "قطع غيار/تشليح"
+        if L.get("source") == "haraj" and not L.get("year") and not str(L.get("added_by", "auto")).count("+") \
+                and L.get("added_by", "auto") == "auto":
+            return "بدون سنة صنع (غالبًا ليس سيارة)"
+        return None
 
     # ---------- fetching ----------
     def fetch(self, url: str) -> dict:
@@ -66,6 +109,7 @@ class Pipeline:
 
         rec = {k: raw.get(k) for k in ("id", "source", "url", "title", "body", "images")}
         rec.update(fields)
+        self.ignored.discard(rec["id"])
         rec["last_seen"] = rec["last_fetched"] = ts
         if old:
             for k in ("status", "notes", "added_by", "first_seen", "notified", "price_history", "votes"):
@@ -86,6 +130,7 @@ class Pipeline:
             rec.setdefault("notes", []).append({"by": added_by, "date": ts[:10], "text": note})
         if added_by != "auto" and old and old.get("added_by") == "auto":
             rec["added_by"] = f"auto+{added_by}"
+        self.apply_override(rec)
         self.idx[rec["id"]] = rec
         return rec
 
@@ -96,7 +141,16 @@ class Pipeline:
 
     # ---------- finish ----------
     def finish(self, run_info=None):
-        listings = list(self.idx.values())
+        listings = []
+        for L in self.idx.values():
+            self.apply_override(L)
+            why = self.should_hide(L)
+            if why:
+                self.ignored.add(L["id"])
+                self.hidden_now.append((L["id"], why))
+            else:
+                listings.append(L)
+        self.db["ignored"] = sorted(self.ignored)[-20000:]
         stats = market_stats([L for L in listings if not L.get("archived")])
         cutoff = datetime.now(timezone.utc) - timedelta(days=self.cfg.get("archive_after_days", 45))
         ncfg = self.cfg.get("notify", {})

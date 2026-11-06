@@ -27,7 +27,7 @@ jobs:
       - run: |
           git config user.name "offroad-bot"
           git config user.email "offroad-bot@users.noreply.github.com"
-          git add docs/data
+          git add docs/data/listings.json
           git diff --cached --quiet && exit 0
           git commit -m "إعادة التقييم"
-          git pull --rebase -X theirs && git push
+          for i in 1 2 3 4; do git pull --rebase -X theirs && git push && break; sleep 5; done

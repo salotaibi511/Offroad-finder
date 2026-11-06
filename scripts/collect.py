@@ -10,6 +10,8 @@ from finder import http  # noqa: E402
 from finder.pipeline import Pipeline, _parse_ts  # noqa: E402
 from finder.sources import generic, haraj  # noqa: E402
 from finder.extract import is_non_car  # noqa: E402
+from finder.web import process_pending, record_hidden  # noqa: E402
+from finder import store  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("collect")
@@ -53,7 +55,7 @@ def main():
     seen, new, recheck = set(), [], []
     stale = datetime.now(timezone.utc) - timedelta(hours=24)
     for url, lid in candidates:
-        if lid in seen:
+        if lid in seen or lid in p.ignored:
             continue
         seen.add(lid)
         old = p.idx.get(lid)
@@ -72,7 +74,10 @@ def main():
         except Exception as e:  # noqa: BLE001
             log.warning("fetch failed %s: %s", url, e)
             run["errors"] += 1
+    process_pending(p)  # links added from the website while this run was queued
     p.finish(run)
+    record_hidden(p)
+    store.save(p.db)
     if run["queries"] == 0 and hcfg.get("enabled"):
         log.error("Haraj returned nothing — the site may be blocking this runner.")
         sys.exit(2)

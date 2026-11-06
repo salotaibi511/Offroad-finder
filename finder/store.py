@@ -23,8 +23,23 @@ def save(db: dict):
     db["updated_at"] = now()
     db["listings"].sort(key=lambda L: (L.get("archived", False), -L.get("score", 0)))
     with open(DATA, "w", encoding="utf-8") as f:
-        json.dump(db, f, ensure_ascii=False, indent=1)
+        json.dump(db, f, ensure_ascii=False, separators=(",", ":"))
 
 
 def index(db: dict) -> dict:
     return {L["id"]: L for L in db["listings"]}
+
+
+EDITS = os.path.join(ROOT, "docs", "data", "edits.json")
+
+
+def load_edits() -> dict:
+    """Edits written by the website (through the Apps Script bridge). Never written by workflows."""
+    try:
+        with open(EDITS, encoding="utf-8") as f:
+            d = json.load(f)
+    except (OSError, ValueError):
+        d = {}
+    d.setdefault("pending", [])
+    d.setdefault("overrides", {})
+    return d
