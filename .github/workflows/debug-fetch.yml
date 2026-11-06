@@ -1,0 +1,36 @@
+name: تشخيص (حفظ صفحات خام)
+
+on:
+  workflow_dispatch:
+    inputs:
+      urls:
+        description: "روابط مفصولة بمسافة"
+        required: true
+
+permissions:
+  contents: write
+
+jobs:
+  dump:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: "3.12"}
+      - run: pip install requests beautifulsoup4 PyYAML
+      - env:
+          URLS: ${{ inputs.urls }}
+        run: |
+          mkdir -p debug
+          python - <<'EOF'
+          import os, sys
+          sys.path.insert(0, ".")
+          from finder.http import get_html
+          for i, u in enumerate(os.environ["URLS"].split()):
+              h = get_html(u, browser_fallback=False)
+              open(f"debug/page{i}.html", "w", encoding="utf-8").write(h or "")
+              print(u, len(h or ""))
+          EOF
+      - run: |
+          git config user.name "offroad-bot"; git config user.email "offroad-bot@users.noreply.github.com"
+          git add debug && git commit -m "debug pages" && git pull --rebase && git push
