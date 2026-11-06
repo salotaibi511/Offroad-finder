@@ -2,7 +2,7 @@ name: البحث التلقائي
 
 on:
   schedule:
-    - cron: "17 */2 * * *"   # كل ساعتين
+    - cron: "17 * * * *"   # كل ساعة
   workflow_dispatch: {}
 
 permissions:

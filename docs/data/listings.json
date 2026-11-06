@@ -1,5 +1,5 @@
 {
- "updated_at": "2026-11-06T19:53:34Z",
+ "updated_at": "2026-11-06T19:57:48Z",
  "listings": [
   {
    "id": "haraj:11192067493",
@@ -65,7 +65,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11188864408",
@@ -130,7 +131,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192072903",
@@ -187,7 +189,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192078617",
@@ -250,7 +253,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192065821",
@@ -313,7 +317,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192097489",
@@ -374,7 +379,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192053665",
@@ -439,7 +445,8 @@
    ],
    "exclude_reasons": [],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192114015",
@@ -510,7 +517,8 @@
     "السعر 105,000 أعلى من الميزانية"
    ],
    "market_median": 230000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192113282",
@@ -582,7 +590,8 @@
     "نيسان باترول 2020 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192101199",
@@ -650,7 +659,8 @@
     "السعر 54,000 أعلى من الميزانية"
    ],
    "market_median": 120000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192100139",
@@ -717,7 +727,8 @@
     "السعر 120,000 أعلى من الميزانية"
    ],
    "market_median": 120000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191715709",
@@ -792,7 +803,8 @@
     "السعر 37,000 أعلى من الميزانية"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11189905042",
@@ -858,7 +870,8 @@
     "سعر 9,000 غير واقعي لـ تاهو/يوكن/سوبربان 2020 (غالبًا رمزي أو دفعة أولى)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192114362",
@@ -931,7 +944,8 @@
     "السعر 35,000 أعلى من الميزانية"
    ],
    "market_median": 52000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110194",
@@ -999,7 +1013,8 @@
     "السعر 52,000 أعلى من الميزانية"
    ],
    "market_median": 120000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192084283",
@@ -1070,7 +1085,8 @@
     "السعر 48,000 أعلى من الميزانية"
    ],
    "market_median": 120000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192125205",
@@ -1143,7 +1159,8 @@
     "السعر 32,000 أعلى من الميزانية"
    ],
    "market_median": 225000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192098994",
@@ -1214,7 +1231,8 @@
     "السعر 48,000 أعلى من الميزانية"
    ],
    "market_median": 120000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192094498",
@@ -1283,7 +1301,8 @@
     "السعر 110,000 أعلى من الميزانية"
    ],
    "market_median": 131800,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110806",
@@ -1354,7 +1373,8 @@
     "السعر 48,000 أعلى من الميزانية"
    ],
    "market_median": 57500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192120882",
@@ -1422,7 +1442,8 @@
     "تويوتا لاندكروزر 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192105623",
@@ -1489,7 +1510,8 @@
     "تويوتا لاندكروزر 2021 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192095235",
@@ -1557,7 +1579,8 @@
     "تويوتا شاص/ربع (70) 2021 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192043429",
@@ -1629,7 +1652,8 @@
     "السعر 27,000 أعلى من الميزانية"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192074927",
@@ -1696,7 +1720,8 @@
     "تويوتا شاص/ربع (70) 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11185553555",
@@ -1764,7 +1789,8 @@
     "تويوتا شاص/ربع (70) 2022 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191925948",
@@ -1832,7 +1858,8 @@
     "تويوتا شاص/ربع (70) 2022 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192056181",
@@ -1900,7 +1927,8 @@
     "تويوتا اف جي 2021 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192045218",
@@ -1965,7 +1993,8 @@
     "تويوتا لاندكروزر 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110757",
@@ -2034,7 +2063,8 @@
     "السعر 239,000 أعلى من الميزانية"
    ],
    "market_median": 266500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191979558",
@@ -2106,7 +2136,8 @@
     "تويوتا شاص/ربع (70) 2010 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192017965",
@@ -2178,7 +2209,8 @@
     "ليس سيارة للبيع (دينه)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191688690",
@@ -2246,7 +2278,8 @@
     "تويوتا هايلكس 2016 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192122921",
@@ -2313,7 +2346,8 @@
     "تويوتا هايلكس 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192118171",
@@ -2381,7 +2415,8 @@
     "تويوتا هايلكس 2022 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192102525",
@@ -2451,7 +2486,8 @@
     "السعر 75,000 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192046678",
@@ -2518,7 +2554,8 @@
     "تويوتا اف جي 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192024617",
@@ -2587,7 +2624,8 @@
     "السعر 159,500 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191979693",
@@ -2657,7 +2695,8 @@
     "السعر 169,000 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110952",
@@ -2725,7 +2764,8 @@
     "تويوتا برادو 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192092822",
@@ -2792,7 +2832,8 @@
     "تويوتا برادو 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192090901",
@@ -2860,7 +2901,8 @@
     "تويوتا برادو 2023 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192050601",
@@ -2927,7 +2969,8 @@
     "تويوتا برادو 2019 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192095112",
@@ -2998,7 +3041,8 @@
     "السعر 210,000 أعلى من الميزانية"
    ],
    "market_median": 225000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110726",
@@ -3069,7 +3113,8 @@
     "ليس سيارة للبيع (إيجار/خدمة)"
    ],
    "market_median": 131800,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192082553",
@@ -3141,7 +3186,8 @@
     "تويوتا شاص/ربع (70) 2013 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191960474",
@@ -3206,7 +3252,8 @@
     "تويوتا هايلكس 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191838042",
@@ -3267,7 +3314,8 @@
     "تويوتا هايلكس 2025 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191502077",
@@ -3332,7 +3380,8 @@
     "تويوتا هايلكس 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11190066048",
@@ -3395,7 +3444,8 @@
     "تويوتا هايلكس 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192117909",
@@ -3459,7 +3509,8 @@
     "تويوتا هايلكس 2019 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192123382",
@@ -3524,7 +3575,8 @@
     "تويوتا برادو 2023 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192092016",
@@ -3590,7 +3642,8 @@
     "السعر 260,000 أعلى من الميزانية"
    ],
    "market_median": 266500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191862714",
@@ -3656,7 +3709,8 @@
     "تويوتا شاص/ربع (70) 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191977687",
@@ -3727,7 +3781,8 @@
     "ليست دبل"
    ],
    "market_median": 169000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192127370",
@@ -3791,7 +3846,8 @@
     "موديل 1988 أقدم من المطلوب"
    ],
    "market_median": 131800,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192079213",
@@ -3855,7 +3911,8 @@
     "تويوتا هايلكس 2022 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192007114",
@@ -3919,7 +3976,8 @@
     "تويوتا شاص/ربع (70) 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192103159",
@@ -3996,7 +4054,8 @@
     "السوم الحالي 118,000 أعلى من الميزانية"
    ],
    "market_median": 131800,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192028339",
@@ -4069,7 +4128,8 @@
     "السعر 59,000 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192084060",
@@ -4142,7 +4202,8 @@
     "السعر 193,000 أعلى من الميزانية"
    ],
    "market_median": 169000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192076701",
@@ -4210,7 +4271,8 @@
     "تويوتا لاندكروزر 2011 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192106708",
@@ -4278,7 +4340,8 @@
     "تويوتا شاص/ربع (70) 2025 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192020038",
@@ -4346,7 +4409,8 @@
     "تويوتا شاص/ربع (70) 2026 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11190933837",
@@ -4413,7 +4477,8 @@
     "تويوتا شاص/ربع (70) 2026 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191969685",
@@ -4481,7 +4546,8 @@
     "تويوتا شاص/ربع (70) 2026 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192110972",
@@ -4551,7 +4617,8 @@
     "السعر 144,000 أعلى من الميزانية"
    ],
    "market_median": 169000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192099517",
@@ -4619,7 +4686,8 @@
     "السعر 240,000 أعلى من الميزانية"
    ],
    "market_median": 225000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192129205",
@@ -4684,7 +4752,8 @@
     "تويوتا لاندكروزر 2026 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192073819",
@@ -4754,7 +4823,8 @@
     "تويوتا لاندكروزر 2009 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192020354",
@@ -4826,7 +4896,8 @@
     "السعر 242,000 أعلى من الميزانية"
    ],
    "market_median": 230000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11173625888",
@@ -4889,7 +4960,8 @@
     "تويوتا شاص/ربع (70) 2011 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191408680",
@@ -4954,7 +5026,8 @@
     "تويوتا لاندكروزر 2027 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192109823",
@@ -5024,7 +5097,8 @@
     "السعر 50,000 أعلى من الميزانية"
    ],
    "market_median": 57500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192121368",
@@ -5092,7 +5166,8 @@
     "نيسان باترول 2014 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192098037",
@@ -5165,7 +5240,8 @@
     "تويوتا لاندكروزر 2024 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11187004479",
@@ -5230,7 +5306,8 @@
     "تويوتا اف جي 2020 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191933538",
@@ -5290,7 +5367,8 @@
     "تويوتا اف جي 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192092801",
@@ -5355,7 +5433,8 @@
     "تويوتا لاندكروزر 2008 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191258941",
@@ -5425,7 +5504,8 @@
     "السعر 535,000 أعلى من الميزانية"
    ],
    "market_median": 230000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191798316",
@@ -5484,7 +5564,8 @@
     "موديل 1989 أقدم من المطلوب"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:1159288568",
@@ -5547,7 +5628,8 @@
     "تويوتا هايلكس 2014 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192000884",
@@ -5610,7 +5692,8 @@
     "تويوتا اف جي 2010 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192088694",
@@ -5678,7 +5761,8 @@
     "تويوتا برادو 2015 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191834409",
@@ -5747,7 +5831,8 @@
     "السعر 169,000 أعلى من الميزانية"
    ],
    "market_median": 169000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192099955",
@@ -5815,7 +5900,8 @@
     "السعر 145,000 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191997821",
@@ -5879,7 +5965,8 @@
     "ليس سيارة للبيع (عازل)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191990623",
@@ -5949,7 +6036,8 @@
     "السعر 185,000 أعلى من الميزانية"
    ],
    "market_median": 152250,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192129474",
@@ -6017,7 +6105,8 @@
     "السعر 130,000 أعلى من الميزانية"
    ],
    "market_median": 52000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192109056",
@@ -6086,7 +6175,8 @@
     "السعر 273,000 أعلى من الميزانية"
    ],
    "market_median": 266500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192059426",
@@ -6155,7 +6245,8 @@
     "السعر 52,000 أعلى من الميزانية"
    ],
    "market_median": 52000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11169305885",
@@ -6214,7 +6305,8 @@
     "تويوتا شاص/ربع (70) 2016 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": null
   },
   {
    "id": "haraj:11182185180",
@@ -6279,7 +6371,8 @@
     "ليس سيارة للبيع (اسطبات)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191847174",
@@ -6341,7 +6434,8 @@
     "ليس سيارة للبيع (إيجار/خدمة)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192070399",
@@ -6405,7 +6499,8 @@
     "السعر 185,000 أعلى من الميزانية"
    ],
    "market_median": 169000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192093935",
@@ -6479,7 +6574,8 @@
     "السعر 65,000 أعلى من الميزانية"
    ],
    "market_median": 57500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192097392",
@@ -6548,7 +6644,8 @@
     "السعر 283,500 أعلى من الميزانية"
    ],
    "market_median": 266500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192096012",
@@ -6609,7 +6706,8 @@
     "ليس سيارة للبيع (كمبيوتر)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192005096",
@@ -6674,7 +6772,8 @@
     "ليس سيارة للبيع (كرونات)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192039798",
@@ -6744,7 +6843,8 @@
     "السعر 69,000 أعلى من الميزانية"
    ],
    "market_median": 57500,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192048584",
@@ -6810,7 +6910,8 @@
     "تويوتا برادو 2010 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192097032",
@@ -6872,7 +6973,8 @@
     "ليس سيارة للبيع (خطوط)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191918362",
@@ -6938,7 +7040,8 @@
     "ليس سيارة للبيع (خطوط)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11141154556",
@@ -7002,7 +7105,8 @@
     "تويوتا هايلكس 2011 سعرها المتوقع فوق الميزانية (السعر غير مذكور)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192090239",
@@ -7067,7 +7171,8 @@
     "ليس سيارة للبيع (قطع غيار)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192076714",
@@ -7135,7 +7240,8 @@
     "السعر 230,000 أعلى من الميزانية"
    ],
    "market_median": 230000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11169180004",
@@ -7203,7 +7309,8 @@
     "ليس سيارة للبيع (ديكور)"
    ],
    "market_median": 230000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192048756",
@@ -7269,7 +7376,8 @@
     "ليس سيارة للبيع (قطع غيار)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192107820",
@@ -7339,7 +7447,8 @@
     "السعر 343,000 أعلى من الميزانية"
    ],
    "market_median": 225000,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192122009",
@@ -7407,7 +7516,8 @@
     "موديل 1984 أقدم من المطلوب"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191861385",
@@ -7474,7 +7584,8 @@
     "ليس سيارة للبيع (مكائن)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192010904",
@@ -7539,7 +7650,8 @@
     "ليس سيارة للبيع (قطع غيار)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191856595",
@@ -7608,7 +7720,8 @@
     "للتشليح/قطع غيار"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192072396",
@@ -7672,7 +7785,8 @@
     "ليس سيارة للبيع (مرايه)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192024748",
@@ -7741,7 +7855,8 @@
     "للتشليح/قطع غيار"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11191978624",
@@ -7808,7 +7923,8 @@
     "ليس سيارة للبيع (قطع غيار)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192097580",
@@ -7878,7 +7994,8 @@
     "ليس سيارة للبيع (مسجل)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192078669",
@@ -7944,7 +8061,8 @@
     "السعر 70,000 أعلى من الميزانية"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192121212",
@@ -8014,7 +8132,8 @@
     "الممشى 670,000 كم أعلى من الحد"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   },
   {
    "id": "haraj:11192123379",
@@ -8086,7 +8205,8 @@
     "ليس سيارة للبيع (مسجل)"
    ],
    "market_median": null,
-   "ai_summary": null
+   "ai_summary": null,
+   "region": "مكة المكرمة"
   }
  ],
  "stats": {
@@ -8116,6 +8236,13 @@
   }
  },
  "runs": [
+  {
+   "trigger": "rescore",
+   "at": "2026-11-06T19:57:48Z",
+   "added": 0,
+   "updated": 0,
+   "notified": 0
+  },
   {
    "trigger": "rescore",
    "at": "2026-11-06T19:53:34Z",
@@ -8159,6 +8286,11 @@
   "dmax": "ايسوزو ديماكس",
   "ranger": "فورد رينجر",
   "lexus_lx_gx": "لكزس LX/GX",
+  "galloper": "هيونداي جالوبر",
+  "trooper": "ايسوزو تروبر",
+  "pathfinder": "نيسان باثفايندر",
+  "xterra": "نيسان اكستيرا",
+  "grand_cherokee": "جيب جراند شيروكي",
   "tahoe_yukon": "تاهو/يوكن/سوبربان"
  },
  "requirements": {

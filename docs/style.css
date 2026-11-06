@@ -82,3 +82,4 @@ dialog{border:0;border-radius:var(--radius);padding:18px;width:min(520px,92vw)}
 dialog textarea{width:100%;font:inherit;padding:10px;border:1px solid var(--line);border-radius:10px}
 .row{display:flex;gap:8px;margin-top:10px}
 @media (max-width:600px){.top,.tiles,.tabs,.panel{padding-left:14px;padding-right:14px}}
+.spec.loc{background:#fbeee3;color:#8a4a1c;font-weight:500}

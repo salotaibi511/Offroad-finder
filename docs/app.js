@@ -41,8 +41,10 @@ async function load() {
 function initFilters() {
   const models = [...new Set(DB.listings.map((l) => l.model_name).filter(Boolean))].sort();
   $("#f-model").innerHTML = `<option value="">كل الموديلات</option>` + models.map((m) => `<option>${esc(m)}</option>`).join("");
+  const regions = [...new Set(DB.listings.map((l) => l.region).filter(Boolean))].sort();
+  $("#f-region").innerHTML = `<option value="">كل المناطق</option>` + regions.map((m) => `<option>${esc(m)}</option>`).join("");
   $("#f-status").innerHTML = `<option value="">كل الحالات</option>` + STATUSES.map((s) => `<option>${s}</option>`).join("");
-  ["#f-q", "#f-model", "#f-dist", "#f-status", "#f-sort", "#f-all"].forEach((s) => $(s).addEventListener("input", render));
+  ["#f-q", "#f-model", "#f-region", "#f-dist", "#f-status", "#f-sort", "#f-all"].forEach((s) => $(s).addEventListener("input", render));
   const chips = Object.keys(LABELS).filter((l) => l !== "مغلق");
   $("#label-chips").innerHTML = chips.map((l) => `<button class="chip ${activeLabels.has(l) ? "on" : ""}" data-l="${l}">${l}</button>`).join("");
   $("#label-chips").onclick = (e) => {
@@ -58,11 +60,13 @@ function initFilters() {
 
 function filtered() {
   const q = $("#f-q").value.trim(), model = $("#f-model").value, dist = +$("#f-dist").value || 0;
+  const region = $("#f-region").value;
   const st = $("#f-status").value, all = $("#f-all").checked, sort = $("#f-sort").value;
   let xs = DB.listings.filter((l) => {
     if (!all && (l.archived || l.label === "مستبعد" || l.label === "مغلق")) return false;
     if (activeLabels.size && !activeLabels.has(l.label) && !(all && (l.label === "مستبعد" || l.label === "مغلق"))) return false;
     if (model && l.model_name !== model) return false;
+    if (region && l.region !== region) return false;
     if (dist && (l.distance_km == null || l.distance_km > dist)) return false;
     if (st && l.status !== st) return false;
     if (q && !`${l.title} ${l.body} ${l.city}`.includes(q)) return false;
@@ -104,7 +108,7 @@ function card(l) {
         <span class="spec">${l.is_4x4 === true ? "دبل ✓" : l.is_4x4 === false ? "غير دبل" : "دبل ؟"}</span>
         ${l.transmission ? `<span class="spec">${esc(l.transmission)}</span>` : ""}
         ${l.fuel ? `<span class="spec">${esc(l.fuel)}</span>` : ""}
-        <span class="spec">📍 ${esc(l.city || "؟")}${l.distance_km ? ` (${fmt(l.distance_km)} كم)` : ""}</span>
+        <span class="spec loc">📍 ${esc(l.city || "المدينة ؟")}${l.region ? " · " + esc(l.region) : ""}${l.distance_km != null ? (l.distance_km === 0 ? " · في جدة" : ` · ~${fmt(l.distance_km)} كم من جدة`) : ""}</span>
       </div>
       ${l.ai_summary ? `<div class="ai">🤖 ${esc(l.ai_summary)}</div>` : ""}
       <ul class="reasons">${reasons}</ul>

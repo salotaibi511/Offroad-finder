@@ -1,0 +1,33 @@
+name: اختبار تيليجرام
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Find chat id / send test message
+        env:
+          TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          CHAT: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: |
+          if [ -z "$TOKEN" ]; then echo "❌ لم تُضف TELEGRAM_BOT_TOKEN بعد"; exit 1; fi
+          if [ -z "$CHAT" ]; then
+            echo "TELEGRAM_CHAT_ID غير مضاف. هذه أرقام المحادثات التي راسلت البوت (انسخ الرقم بجانب id):"
+            curl -s "https://api.telegram.org/bot$TOKEN/getUpdates" | python3 -c "
+          import json,sys
+          d=json.load(sys.stdin)
+          seen=set()
+          for u in d.get('result',[]):
+              m=u.get('message') or u.get('my_chat_member') or {}
+              c=m.get('chat',{})
+              if c.get('id') not in seen:
+                  seen.add(c.get('id')); print('  id =', c.get('id'), '|', c.get('title') or c.get('first_name'))
+          if not seen: print('  لا شيء — أرسل أي رسالة للبوت أولًا ثم أعد التشغيل')
+          "
+            exit 1
+          fi
+          curl -s -X POST "https://api.telegram.org/bot$TOKEN/sendMessage" \
+            -d chat_id="$CHAT" -d text="✅ رادار سيارة البر متصل — ستصلك الفرص هنا" | grep -q '"ok":true' \
+            && echo "✅ وصلت رسالة الاختبار" || { echo "❌ فشل الإرسال — تأكد من الرقم"; exit 1; }
