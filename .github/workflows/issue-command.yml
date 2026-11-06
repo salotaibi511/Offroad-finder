@@ -1,0 +1,56 @@
+name: إضافة عروض وتحديث الحالات
+
+on:
+  issues:
+    types: [opened]
+  issue_comment:
+    types: [created]
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: data-write
+  cancel-in-progress: false
+
+jobs:
+  handle:
+    # فقط صاحب المستودع والمتعاونون المضافون
+    if: >-
+      contains(fromJSON('["OWNER","MEMBER","COLLABORATOR"]'),
+        github.event_name == 'issue_comment' && github.event.comment.author_association || github.event.issue.author_association)
+      && (github.event_name == 'issues' || startsWith(github.event.comment.body, '/'))
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+          cache: pip
+      - run: pip install -r requirements.txt
+      - run: python -m playwright install --with-deps chromium
+      - name: Process
+        env:
+          ISSUE_BODY: ${{ github.event_name == 'issue_comment' && github.event.comment.body || github.event.issue.body }}
+          ISSUE_USER: ${{ github.event_name == 'issue_comment' && github.event.comment.user.login || github.event.issue.user.login }}
+          ANTHROPIC_API_KEY: ${{ secrets.ANTHROPIC_API_KEY }}
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+        run: python scripts/issue_command.py
+      - name: Save data
+        run: |
+          git config user.name "offroad-bot"
+          git config user.email "offroad-bot@users.noreply.github.com"
+          git add docs/data
+          git diff --cached --quiet || git commit -m "طلب #${{ github.event.issue.number }}"
+          git pull --rebase -X theirs && git push
+      - name: Reply
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh issue comment ${{ github.event.issue.number }} --repo ${{ github.repository }} --body-file reply.md
+          if [ "${{ github.event_name }}" = "issues" ]; then
+            gh issue close ${{ github.event.issue.number }} --repo ${{ github.repository }}
+          fi

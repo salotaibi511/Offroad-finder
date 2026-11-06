@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>رادار سيارة البر</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans+Arabic:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+<header class="top">
+  <div class="brand">
+    <div class="logo">⛰</div>
+    <div>
+      <h1>رادار سيارة البر</h1>
+      <p id="updated" class="muted">جارِ التحميل…</p>
+    </div>
+  </div>
+  <nav class="actions">
+    <a id="btn-add" class="btn primary" target="_blank">➕ أضف عرض</a>
+    <a id="btn-run" class="btn" target="_blank">▶ بحث الآن</a>
+    <a id="btn-config" class="btn" target="_blank">⚙ المواصفات</a>
+  </nav>
+</header>
+
+<section class="tiles" id="tiles"></section>
+
+<div class="tabs" role="tablist">
+  <button class="tab active" data-tab="offers">العروض</button>
+  <button class="tab" data-tab="pipeline">المتابعة</button>
+  <button class="tab" data-tab="market">السوق</button>
+</div>
+
+<section id="offers" class="panel active">
+  <div class="filters">
+    <input id="f-q" type="search" placeholder="بحث في العنوان والوصف…">
+    <select id="f-model"><option value="">كل الموديلات</option></select>
+    <select id="f-dist">
+      <option value="">كل المدن</option>
+      <option value="200">حتى 200 كم من جدة</option>
+      <option value="450">حتى 450 كم</option>
+      <option value="900">حتى 900 كم</option>
+    </select>
+    <select id="f-status"><option value="">كل الحالات</option></select>
+    <select id="f-sort">
+      <option value="score">الأعلى تقييمًا</option>
+      <option value="new">الأحدث</option>
+      <option value="price">الأقل سعرًا</option>
+      <option value="km">الأقل ممشى</option>
+      <option value="year">الأحدث موديلًا</option>
+    </select>
+    <label class="chk"><input id="f-all" type="checkbox"> إظهار المستبعد والمؤرشف</label>
+  </div>
+  <div class="chips" id="label-chips"></div>
+  <div id="list" class="grid"></div>
+  <p id="empty" class="empty hidden"></p>
+</section>
+
+<section id="pipeline" class="panel"><div id="board" class="board"></div></section>
+
+<section id="market" class="panel">
+  <p class="muted">متوسط الأسعار المطلوبة لكل موديل من العروض التي جمعها النظام (يظهر الموديل عند توفر 4 عروض مسعّرة أو أكثر). كلما زادت البيانات صار التقييم أدق.</p>
+  <table class="tbl" id="market-tbl"></table>
+  <h3>آخر عمليات البحث</h3>
+  <table class="tbl" id="runs-tbl"></table>
+</section>
+
+<dialog id="msg-dlg">
+  <h3>رسالة جاهزة للبائع</h3>
+  <textarea id="msg-text" rows="9"></textarea>
+  <div class="row"><button class="btn primary" id="msg-copy">نسخ</button><a class="btn" id="msg-wa" target="_blank">واتساب</a><button class="btn" onclick="this.closest('dialog').close()">إغلاق</button></div>
+</dialog>
+
+<script src="app.js"></script>
+</body>
+</html>

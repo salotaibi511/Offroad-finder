@@ -1,0 +1,18 @@
+name: ➕ أضف عرض
+description: الصق رابط إعلان أو رابط صفحة بحث (حراج، السوق المفتوح، يلا موتور، موتري...)
+title: "عرض جديد"
+labels: ["عرض"]
+body:
+  - type: textarea
+    id: links
+    attributes:
+      label: روابط العروض
+      description: رابط أو أكثر، كل رابط في سطر. رابط صفحة بحث يضيف كل الإعلانات فيها.
+      placeholder: https://haraj.com.sa/11192126812/...
+    validations:
+      required: true
+  - type: textarea
+    id: notes
+    attributes:
+      label: ملاحظات
+      description: اختياري — أي معلومة عن العرض (كلمت البائع، شفتها، ...)

@@ -1,0 +1,21 @@
+name: 🔄 تحديث حالة عرض
+description: غيّر حالة عرض في مسار المتابعة أو أضف ملاحظة
+title: "تحديث حالة"
+labels: ["حالة"]
+body:
+  - type: input
+    id: offer_id
+    attributes:
+      label: رقم العرض
+      description: يظهر في بطاقة العرض في الموقع (مثل haraj:11192126812) — أو الصق رابط الإعلان
+    validations:
+      required: true
+  - type: dropdown
+    id: status
+    attributes:
+      label: الحالة
+      options: ["جديد", "تواصلت", "بانتظار رد", "معاينة", "فحص", "تفاوض", "مستبعد يدويًا", "تم الشراء", "مباع"]
+  - type: textarea
+    id: note
+    attributes:
+      label: ملاحظة
