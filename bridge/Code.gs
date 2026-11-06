@@ -179,7 +179,17 @@ function out_(obj) {
   return ContentService.createTextOutput(JSON.stringify(obj)).setMimeType(ContentService.MimeType.JSON);
 }
 
-/** شغّل هذه الدالة مرة من المحرر للتأكد أن المفتاح يعمل */
+/** جدولة احتياطية: GitHub يؤخر الجدولة أحيانًا، فهذا يشغّل البحث كل ساعة بشكل مضمون */
+function hourly() { dispatch_('collect.yml'); }
+
+/** شغّل هذه الدالة مرة واحدة من المحرر: تختبر المفتاح وتفعّل التشغيل كل ساعة */
+function setup() {
+  Logger.log('GitHub: ' + JSON.parse(gh_('GET', '')).full_name + ' ✓');
+  ScriptApp.getProjectTriggers().forEach(function (t) { ScriptApp.deleteTrigger(t); });
+  ScriptApp.newTrigger('hourly').timeBased().everyHours(1).create();
+  Logger.log('تم تفعيل البحث كل ساعة ✓');
+}
+
 function test() {
   Logger.log(gh_('GET', ''));
   Logger.log(JSON.stringify(readEdits_().data).slice(0, 200));
