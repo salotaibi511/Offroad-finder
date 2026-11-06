@@ -9,6 +9,7 @@ sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 from finder import http  # noqa: E402
 from finder.pipeline import Pipeline, _parse_ts  # noqa: E402
 from finder.sources import generic, haraj  # noqa: E402
+from finder.extract import is_non_car  # noqa: E402
 
 logging.basicConfig(level=logging.INFO, format="%(levelname)s %(message)s")
 log = logging.getLogger("collect")
@@ -23,16 +24,21 @@ def main():
 
     candidates = []  # (url, id)
     if hcfg.get("enabled"):
-        for q in hcfg["queries"]:
-            try:
-                items = haraj.search(q)
-            except Exception as e:  # noqa: BLE001
-                log.warning("search failed %s: %s", q, e)
-                run["errors"] += 1
-                continue
-            run["queries"] += 1
-            run["links"] += len(items)
-            candidates += [(x["url"], f"haraj:{x['id']}") for x in items]
+        for city in hcfg.get("cities") or [""]:
+            for q in hcfg["queries"]:
+                try:
+                    items = haraj.search(q, city)
+                except Exception as e:  # noqa: BLE001
+                    log.warning("search failed %s: %s", q, e)
+                    run["errors"] += 1
+                    continue
+                run["queries"] += 1
+                run["links"] += len(items)
+                for x in items:
+                    if is_non_car(x["title"]):
+                        run["skipped_non_car"] = run.get("skipped_non_car", 0) + 1
+                        continue
+                    candidates.append((x["url"], f"haraj:{x['id']}"))
     for su in p.cfg["sources"].get("extra_search_urls") or []:
         try:
             items = generic.search(su) if not haraj.is_haraj(su) else \

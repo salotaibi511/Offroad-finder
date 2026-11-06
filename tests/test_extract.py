@@ -51,15 +51,32 @@ def test_parts_and_budget():
     assert "أعلى من الميزانية" in score(f2, CFG, {})["exclude_reasons"][0]
 
 
-def test_haraj_parsers():
-    html = """<html><head><meta property="og:title" content="لاندكروزر 2013 | موقع حراج">
-    <meta property="og:description" content="موتر نظيف جداً جير مكينه شاصي شرط">
-    <meta property="og:image" content="https://img/1.jpg"></head><body>
-    <h1>لاندكروزر 2013</h1><div>الرياض</div><div>قبل ٥٢ دقيقة</div>
-    <div>السوم واصل</div><div>٧٥</div><div>400 ألف كيلو أو أكثر</div>
-    <a href="/11192126812/جيب_لاندكروزر_2003_/">جيب لاندكروزر 2003</a></body></html>"""
-    L = haraj.parse_listing(html, "https://haraj.com.sa/11192126492/x/")
-    assert L["title"] == "لاندكروزر 2013" and L["price"] == 75000 and L["price_type"] == "bid"
-    assert L["city"] == "الرياض" and "400" in L["fields_text"]
-    links = haraj.parse_search(html)
-    assert links[0]["id"] == "11192126812"
+FX = os.path.join(os.path.dirname(__file__), "fixtures")
+
+
+def _fx(name):
+    return open(os.path.join(FX, name), encoding="utf-8").read()
+
+
+def test_haraj_real_pages():
+    a = haraj.parse_listing(_fx("haraj_ad_price.html"), "https://haraj.com.sa/11192127908/")
+    assert a["id"] == "haraj:11192127908" and a["price"] == 70000 and a["price_type"] == "asking"
+    assert a["city"] == "صبيا" and a["year"] == 2002 and a["mileage_km"] == 400000
+    b = haraj.parse_listing(_fx("haraj_ad_bid.html"), "https://haraj.com.sa/11192127633/x/")
+    assert b["price"] == 106000 and b["price_type"] == "bid" and b["is_4x4"] and b["transmission"] == "عادي"
+    c = haraj.parse_listing(_fx("haraj_ad_fields.html"), "https://haraj.com.sa/11192130098/")
+    assert c["price"] is None and c["year"] == 2022 and c["mileage_km"] == 53000
+    f = extract(c, CFG)
+    assert any("فوق الميزانية" in r for r in score(f, CFG, {})["exclude_reasons"])
+    links = haraj.parse_search(_fx("haraj_search.html"))
+    assert len(links) >= 15
+
+
+def test_non_car():
+    from finder.extract import is_non_car
+    for t in ["صاجه حمايه لاندكروزر 2022", "جنوط برايد لاندكروزر", "دباب سوزوكي 2014 الف مشروط مكينه قير شاص",
+              "ايسوزو دينا 13 طن 2025 شاص طويل", "طيس جيب شاص وربع", "جركل ربع بريمي وكاله"]:
+        assert is_non_car(t), t
+    for t in ["شاص ونش 2010", "لاندكروزر 2003 كفرات جديده", "جيب ربع 2018", "شاص 2002"]:
+        assert not is_non_car(t), t
+    assert parse_price("ب550ريال")[0] is None

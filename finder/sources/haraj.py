@@ -11,7 +11,7 @@ from ..textnorm import digits, norm
 
 log = logging.getLogger(__name__)
 BASE = "https://haraj.com.sa"
-POST_RE = re.compile(r"(?:https?://(?:www\.)?haraj\.com\.sa)?/(11\d{6,})/([^/?#\"'\s]+)/?")
+POST_RE = re.compile(r"(?:https?://(?:www\.)?haraj\.com\.sa)?/(11\d{6,})(?:/([^/?#\"'\s]+))?/?")
 
 
 def is_listing_url(url: str) -> bool:
@@ -22,8 +22,8 @@ def is_haraj(url: str) -> bool:
     return "haraj.com.sa" in url
 
 
-def search_url(query: str) -> str:
-    return f"{BASE}/search/{quote(query)}"
+def search_url(query: str, city: str = "") -> str:
+    return f"{BASE}/search/{quote(query)}" + (f"/city/{quote(city)}" if city else "")
 
 
 def canonical(post_id: str, slug: str = "") -> str:
@@ -42,15 +42,16 @@ def parse_search(html: str) -> list:
         if pid in seen:
             continue
         seen.add(pid)
-        title = a.get_text(" ", strip=True) or unquote(m.group(2)).replace("_", " ")
-        out.append({"id": pid, "url": canonical(pid, m.group(2)), "title": title})
+        slug = m.group(2) or ""
+        title = a.get_text(" ", strip=True) or unquote(slug).replace("_", " ")
+        out.append({"id": pid, "url": canonical(pid, slug), "title": title})
     if not out:  # links may only exist inside embedded JSON
         for m in POST_RE.finditer(html):
             pid = m.group(1)
             if pid not in seen:
                 seen.add(pid)
-                out.append({"id": pid, "url": canonical(pid, m.group(2)),
-                            "title": unquote(m.group(2)).replace("_", " ")})
+                out.append({"id": pid, "url": canonical(pid, m.group(2) or ""),
+                            "title": unquote(m.group(2) or "").replace("_", " ")})
     return out
 
 
@@ -78,72 +79,99 @@ def _json_hint(html: str, post_id: str) -> dict:
     return out
 
 
+SPEC_TRANS = {"قير عادي": "عادي", "قير اوتوماتيك": "أوتوماتيك", "قير أوتوماتيك": "أوتوماتيك"}
+
+
 def parse_listing(html: str, url: str) -> dict:
+    """Haraj ad page layout (Nov 2026):
+    breadcrumb (حراج السيارات / تويوتا / شاص / شاص 2002) → title → city → time → author →
+    [price line] → spec line (تويوتا شاص 2002 مستخدم) → [قير عادي] [بنزين] [الممشى: 400 ألف كيلو] [دبل]
+    → body lines → تواصل
+    """
     soup = BeautifulSoup(html, "html.parser")
     m = POST_RE.search(url)
     pid = m.group(1) if m else url
-    title = re.sub(r"\s*\|\s*موقع حراج\s*$", "", _meta(soup, "og:title") or (soup.title.string if soup.title else ""))
-    body = _meta(soup, "og:description")
+    title = re.sub(r"\s*\|\s*موقع حراج\s*$", "", _meta(soup, "og:title") or (soup.title.string if soup.title else "")).strip()
+    og_body = _meta(soup, "og:description")
     images = [t.get("content") for t in soup.find_all("meta", attrs={"property": "og:image"}) if t.get("content")]
 
-    for s in soup(["script", "style", "noscript", "svg"]):
-        s.extract()
-    text = digits(soup.get_text("\n", strip=True))
-    # cut off "similar ads" and footer so they don't pollute extraction
-    for marker in ("إعلانات مشابهة", "اعلانات مشابهة", "قد يعجبك", "حراج السيارات\nتويوتا", "الشروط والأحكام"):
-        k = text.find(marker)
-        if k > 200:
-            text = text[:k]
-    lines = [l for l in text.split("\n") if l.strip()]
+    for t in soup(["script", "style", "noscript", "svg"]):
+        t.extract()
+    lines = [l.strip().replace("\xa0", " ").strip() for l in digits(soup.get_text("\n", strip=True)).split("\n")]
+    lines = [l for l in lines if l]
 
-    price, ptype = None, None
-    for i, line in enumerate(lines):
-        ln = norm(line)
-        if "السوم واصل" in ln or ln in ("السعر", "السعر:") or ln.startswith("السعر"):
-            win = " ".join(lines[i: i + 3])
-            nums = [float(x.replace(",", "")) for x in re.findall(r"\d[\d,]*(?:\.\d+)?", win)]
-            nums = [x for x in nums if x > 0]
-            if nums:
-                v = nums[0]
-                v = v * 1000 if v < 1000 else v
-                price, ptype = int(v), ("bid" if "السوم" in ln else "asking")
-                break
-
-    city = None
-    known = ["جدة", "مكة", "الرياض", "الدمام", "الطائف", "المدينة", "ينبع", "رابغ", "تبوك", "حائل", "أبها",
-             "جازان", "نجران", "الخبر", "القصيم", "بريدة", "الأحساء", "الباحة", "الليث", "القنفذة", "سكاكا",
-             "الجوف", "عرعر", "بيشة", "خميس مشيط", "الخرج", "الجبيل", "حفر الباطن", "القريات", "العلا"]
-    for line in lines[:40]:
-        if line.strip() in known:
-            city = line.strip()
+    out = {"id": f"haraj:{pid}", "source": "haraj", "url": url, "title": title, "images": images[:6],
+           "price": None, "price_type": None}
+    # locate the title that follows the breadcrumb
+    t_idx = None
+    for i in range(1, len(lines)):
+        if lines[i] == title and i > 3 and lines[i - 1] != "/":
+            t_idx = i
             break
+    try:
+        b0 = lines.index("حراج السيارات")
+        out["category"] = " / ".join(x for x in lines[b0:(t_idx or b0 + 8)] if x != "/")
+    except ValueError:
+        out["category"] = ""
+    if t_idx is None:
+        out["body"] = og_body
+        return out
 
-    mileage_line = next((l for l in lines if re.search(r"(?:ألف|الف)\s*كيلو|كيلومتر", l)), "")
-    hint = _json_hint(html, str(pid))
-    if not price and hint.get("price"):
-        v = int(hint["price"])
-        price, ptype = (v * 1000 if 0 < v < 1000 else v), "asking"
-    if not body and hint.get("body"):
-        body = hint["body"]
+    out["city"] = lines[t_idx + 1] if len(lines) > t_idx + 1 else None
+    k = t_idx + 4  # skip city, time, author
+    fields, body = [], []
+    while k < len(lines):
+        l = lines[k]
+        if l in ("تواصل", "مراسلة"):
+            break
+        if not body:
+            if re.fullmatch(r"\d{1,3}(?:,\d{3})+|\d{3,7}", l) and out["price"] is None:
+                out["price"], out["price_type"] = int(l.replace(",", "")), "asking"
+                k += 1
+                continue
+            if l.startswith("الممشى"):
+                fields.append(l)
+                mk = re.search(r"(\d[\d,]*)\s*(ألف|الف)?", l)
+                if mk:
+                    v = int(mk.group(1).replace(",", ""))
+                    out["mileage_km"] = v * 1000 if mk.group(2) or v < 1000 else v
+                k += 1
+                continue
+            if l in SPEC_TRANS:
+                out["transmission"] = SPEC_TRANS[l]
+                k += 1
+                continue
+            if l in ("بنزين", "ديزل", "هايبرد", "كهرباء"):
+                out["fuel"] = l
+                k += 1
+                continue
+            if l == "دبل":
+                out["is_4x4"], out["is_4x4_source"] = True, "حقل الإعلان"
+                k += 1
+                continue
+            if re.search(r"(?:19|20)\d{2}", l) and (l.endswith("مستخدم") or l.endswith("جديد") or len(fields) == 0) \
+                    and len(l) < 60 and not body and k <= t_idx + 6:
+                fields.append(l)
+                my = re.search(r"(?:19|20)\d{2}", l)
+                out["year"] = int(my.group(0))
+                k += 1
+                continue
+        body.append(l)
+        k += 1
+    out["fields_text"] = " | ".join(fields)
+    out["body"] = "\n".join(body) or og_body
+    if out["price"] is None:
+        mb = re.search(r"السوم\s*(?:واصل|وصل)\s*(\d[\d,]*)", out["body"])
+        if mb:
+            v = int(mb.group(1).replace(",", ""))
+            out["price"], out["price_type"] = (v * 1000 if v < 1000 else v), "bid"
+    return out
 
-    return {
-        "id": f"haraj:{pid}",
-        "source": "haraj",
-        "url": url,
-        "title": title.strip(),
-        "body": body,
-        "fields_text": mileage_line,
-        "city": city or hint.get("city"),
-        "price": price,
-        "price_type": ptype,
-        "images": images[:6],
-    }
 
-
-def search(query: str) -> list:
-    html = get_html(search_url(query))
+def search(query: str, city: str = "") -> list:
+    html = get_html(search_url(query, city))
     items = parse_search(html) if html else []
-    log.info("haraj '%s': %d links", query, len(items))
+    log.info("haraj '%s' [%s]: %d links", query, city or "كل المدن", len(items))
     return items
 
 

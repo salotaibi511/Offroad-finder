@@ -30,7 +30,7 @@ def score(L: dict, cfg: dict, stats: dict) -> dict:
 
     # ---- hard filters ----
     if price and price > req["max_price"]:
-        exclude.append(f"السعر {price:,} أعلى من الميزانية")
+        exclude.append(("السوم الحالي" if ptype == "bid" else "السعر") + f" {price:,} أعلى من الميزانية")
     if L.get("year") and L["year"] < req["min_year"]:
         exclude.append(f"موديل {L['year']} أقدم من المطلوب")
     if L.get("mileage_km") and L["mileage_km"] > req["max_mileage_km"]:
@@ -39,6 +39,13 @@ def score(L: dict, cfg: dict, stats: dict) -> dict:
         exclude.append("ليست دبل")
     if req.get("exclude_parts_cars") and L.get("parts_car"):
         exclude.append("للتشليح/قطع غيار")
+    if L.get("non_car"):
+        exclude.append(f"ليس سيارة للبيع ({L['non_car']})")
+    if price and price < req.get("min_plausible_price", 5000):
+        exclude.append(f"سعر {price:,} غير منطقي لسيارة (قطعة أو إكسسوار؟)")
+    mk_cfg = cfg["models"].get(L.get("model_key") or "", {})
+    if not price and L.get("year") and mk_cfg.get("max_year") and L["year"] > mk_cfg["max_year"]:
+        exclude.append(f"{mk_cfg['name']} {L['year']} سعرها المتوقع فوق الميزانية (السعر غير مذكور)")
 
     # ---- price value ----
     budget_v = None

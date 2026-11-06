@@ -41,6 +41,27 @@ GREEN = ["شرط", "ماكينه شرط", "مكينه شرط", "قير شرط", 
          "صبغ وكاله", "اسم واحد", "صيانه وكاله", "مجهز", "تجهيز بر", "ونش", "كفرات جديده", "اطارات جديده",
          "شاصي شرط", "ماكينه وكاله", "مكينه وكاله"]
 PARTS = ["قطع غيار", "للتشليح", "تشليح", "سكراب", "تشريح"]
+# title words that mean the ad is an accessory / part / other vehicle, not a car for sale
+NON_CAR = ["دباب", "دبابه", "دبابات", "صاجه", "حمايه", "جنوط", "جنط", "كفرات", "كفر", "اطارات", "اطار", "طيس",
+           "تكايه", "مرتبه", "مراتب", "صدام", "رفرف", "رفارف", "شبك", "اسطب", "اسطبات", "شمعات", "كبوت", "بودي",
+           "سماعات", "شاشه", "تظليل", "لمبات", "ليتات", "مقاعد", "كراسي", "دعاسات", "غطاء", "جركل", "جراكل",
+           "اغراض", "ونش", "دفلك", "سنوركل", "عفشه", "مساعدات", "قير", "مكينه", "ماكينه", "ماطور",
+           "مطلوب", "ابغى", "ابغي", "ابي", "ابحث", "شراء"]
+OTHER_VEHICLES = ["دينا", "باص", "شاحنه", "تريله", "قلاب", "دباب", "دبابه", "بانشي"]
+NON_CAR_CATEGORY = ["قطع غيار", "ملحقات", "اكسسوارات", "دبابات", "شاحنات", "معدات"]
+
+
+def is_non_car(title: str, category: str = "") -> str | None:
+    t = norm(title)
+    words = t.split()
+    hits = contains_any(" ".join(words[:1]), NON_CAR) or contains_any(" ".join(words[:3]), OTHER_VEHICLES)
+    if hits:
+        return hits[0]
+    c = norm(category)
+    for w in NON_CAR_CATEGORY:
+        if norm(w) in c:
+            return w
+    return None
 
 _NUM = r"(\d{1,3}(?:[,\.]\d{3})+|\d+(?:\.\d+)?)"
 
@@ -58,6 +79,8 @@ def _to_number(s: str) -> float:
 def _thousands(val: float, unit: str, small_means_k: bool) -> int:
     if unit and norm(unit) in ("الف", "k"):
         val *= 1000
+    elif unit and norm(unit) == "ريال":
+        pass
     elif small_means_k and 0 < val < 1000:
         val *= 1000
     return int(val)
@@ -185,6 +208,7 @@ def extract(raw: dict, cfg: dict) -> dict:
     parts = bool(contains_any(n, PARTS))
 
     city = detect_city(f"{title}\n{body}", raw.get("city") or "")
+    non_car = is_non_car(title, raw.get("category") or "")
 
     return {
         "model_key": model_key,
@@ -203,4 +227,6 @@ def extract(raw: dict, cfg: dict) -> dict:
         "red_flags": medium,
         "green_flags": green,
         "parts_car": parts,
+        "non_car": non_car,
+        "category": raw.get("category"),
     }
