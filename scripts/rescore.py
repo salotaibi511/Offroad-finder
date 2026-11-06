@@ -14,7 +14,7 @@ p = Pipeline()
 for L in p.idx.values():
     keep_ai = L.get("ai_summary")
     raw = dict(L)
-    for k in ("model_key", "year", "mileage_km", "is_4x4"):  # let rules recompute with new config
+    for k in ("model_key", "model_name"):  # let rules recompute with new config (keep page fields)
         raw.pop(k, None)
     L.update(extract(raw, p.cfg))
     L["ai_summary"] = keep_ai

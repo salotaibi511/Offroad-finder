@@ -80,3 +80,25 @@ def test_non_car():
     for t in ["شاص ونش 2010", "لاندكروزر 2003 كفرات جديده", "جيب ربع 2018", "شاص 2002"]:
         assert not is_non_car(t), t
     assert parse_price("ب550ريال")[0] is None
+
+
+def test_real_data_regressions():
+    from finder.extract import is_non_car
+    for t in ["عازل حراري انشيلد اف جي", "للبيع اسطبات شاص", "تويوتا هايس للايجار", "كمبيوتر سيارة باترول",
+              "كرونات هايلوكس شاص دفلوك", "خطوط باترول 97", "مكائن تايوتا ربع هايلوكس", "ديكور المكيف شاص 2011",
+              "دينة اسيزو 2022 وكالة شاص"]:
+        assert is_non_car(t), t
+    f = extract({"title": "للبيع فورد إكسبدشن 2009 دبل شاص", "body": "", "price": 37000, "price_type": "asking",
+                 "category": "حراج السيارات / فورد / اكسبيدشن / اكسبيدشن 2009"}, CFG)
+    assert f["model_key"] is None and "اكسبيدشن" in f["model_name"]
+    f = extract({"title": "جيب ربع تايوتا مصندق", "body": "", "price": 105, "price_type": "asking", "year": 2018,
+                 "category": "حراج السيارات / تويوتا / ربع / ربع 2018"}, CFG)
+    assert f["model_key"] == "lc70" and f["price"] == 105000
+    f = extract({"title": "نيسان باترول 2020", "body": "", "price": 1000, "price_type": "asking", "year": 2020}, CFG)
+    assert f["price"] is None
+    f = extract({"title": "لاندكروزر gxr 2006", "body": "", "mileage_km": 1000, "year": 2006}, CFG)
+    assert f["mileage_km"] is None
+    f = extract({"title": "جمس يوكن 2020", "body": "", "price": 9000, "price_type": "asking", "year": 2020,
+                 "category": "حراج السيارات / جي ام سي / يوكن / يوكن 2020"}, CFG)
+    s = score(f, CFG, {})
+    assert s["label"] == "مستبعد" and s["score"] <= 35

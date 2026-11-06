@@ -44,6 +44,9 @@ def score(L: dict, cfg: dict, stats: dict) -> dict:
     if price and price < req.get("min_plausible_price", 5000):
         exclude.append(f"سعر {price:,} غير منطقي لسيارة (قطعة أو إكسسوار؟)")
     mk_cfg = cfg["models"].get(L.get("model_key") or "", {})
+    if price and price <= req["max_price"] and L.get("year") and mk_cfg.get("max_year") \
+            and L["year"] > mk_cfg["max_year"] + 4:
+        exclude.append(f"سعر {price:,} غير واقعي لـ {mk_cfg['name']} {L['year']} (غالبًا رمزي أو دفعة أولى)")
     if not price and L.get("year") and mk_cfg.get("max_year") and L["year"] > mk_cfg["max_year"]:
         exclude.append(f"{mk_cfg['name']} {L['year']} سعرها المتوقع فوق الميزانية (السعر غير مذكور)")
 
@@ -154,6 +157,9 @@ def score(L: dict, cfg: dict, stats: dict) -> dict:
         label = "يستحق السؤال"
     else:
         label = "ضعيف"
+
+    if exclude:  # keep excluded offers below every live one
+        total = min(total, 35)
 
     return {
         "score": total,

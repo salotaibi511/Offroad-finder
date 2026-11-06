@@ -46,14 +46,19 @@ NON_CAR = ["دباب", "دبابه", "دبابات", "صاجه", "حمايه", "
            "تكايه", "مرتبه", "مراتب", "صدام", "رفرف", "رفارف", "شبك", "اسطب", "اسطبات", "شمعات", "كبوت", "بودي",
            "سماعات", "شاشه", "تظليل", "لمبات", "ليتات", "مقاعد", "كراسي", "دعاسات", "غطاء", "جركل", "جراكل",
            "اغراض", "ونش", "دفلك", "سنوركل", "عفشه", "مساعدات", "قير", "مكينه", "ماكينه", "ماطور",
-           "مطلوب", "ابغى", "ابغي", "ابي", "ابحث", "شراء"]
-OTHER_VEHICLES = ["دينا", "باص", "شاحنه", "تريله", "قلاب", "دباب", "دبابه", "بانشي"]
-NON_CAR_CATEGORY = ["قطع غيار", "ملحقات", "اكسسوارات", "دبابات", "شاحنات", "معدات"]
+           "مطلوب", "ابغى", "ابغي", "ابي", "ابحث", "شراء", "عازل", "كمبيوتر", "كرونات", "كرون", "خطوط",
+           "مكائن", "مكاين", "مسجل", "ديكور", "قطع", "طقم", "فرش", "دركسون", "رديتر", "كمبروسر", "دينمو",
+           "سلف", "اسطوانه", "اسطوانات", "زجاج", "مرايا", "مرايه", "ستيكر", "بطاريه", "فلتر", "زيت"]
+RENT = ["للايجار", "ايجار", "تاجير", "للتاجير", "توصيل", "نقل"]
+OTHER_VEHICLES = ["دينا", "دينه", "هايس", "باص", "شاحنه", "تريله", "قلاب", "دباب", "دبابه", "بانشي"]
+NON_CAR_CATEGORY = ["قطع غيار", "ملحقات", "اكسسوارات", "دبابات", "شاحنات", "معدات", "باص"]
 
 
 def is_non_car(title: str, category: str = "") -> str | None:
     t = norm(title)
-    words = t.split()
+    words = [w for w in t.split() if w not in ("للبيع", "بيع", "عرض", "عاجل")]
+    if contains_any(t, RENT):
+        return "إيجار/خدمة"
     hits = contains_any(" ".join(words[:1]), NON_CAR) or contains_any(" ".join(words[:3]), OTHER_VEHICLES)
     if hits:
         return hits[0]
@@ -167,7 +172,14 @@ def extract(raw: dict, cfg: dict) -> dict:
     full = f"{title}\n{body}\n{extra}"
     n = norm(full)
 
-    model_key = raw.get("model_key") or detect_model(n, cfg["models"])
+    # Haraj breadcrumb: حراج السيارات / البراند / الموديل / الموديل+السنة — most reliable model source
+    cat_parts = [p.strip() for p in (raw.get("category") or "").split("/") if p.strip()]
+    cat_model, cat_name = None, None
+    if len(cat_parts) >= 3:
+        cat_model = detect_model(norm(" ".join(cat_parts[1:3])), cfg["models"])
+        cat_name = f"{cat_parts[1]} {cat_parts[2].split(',')[0]}"
+    model_key = raw.get("model_key") or (cat_model if len(cat_parts) >= 3 else None) \
+        or (None if len(cat_parts) >= 3 else detect_model(n, cfg["models"]))
 
     price, ptype = raw.get("price"), raw.get("price_type")
     if not price:
@@ -177,6 +189,17 @@ def extract(raw: dict, cfg: dict) -> dict:
 
     mileage = raw.get("mileage_km") or parse_mileage(f"{body}\n{extra}\n{title}")
     year = raw.get("year") or parse_year(title, body + "\n" + extra)
+
+    # price sanity: Haraj sellers write prices in thousands (105 = 105,000) or put placeholders (1000, 1111)
+    if price:
+        p = int(price)
+        if len(set(str(p))) == 1 or p in (1000, 123, 1234, 12345, 123456, 10, 100):
+            price, ptype = None, "negotiable"
+        elif p < 1000:
+            price = p * 1000
+    # mileage placeholder (e.g. 1000 km on a 15-year-old car)
+    if mileage and mileage < 5000 and year and year < CURRENT_YEAR - 2:
+        mileage = None
 
     n_4 = n
     for dc in DOUBLE_CAB:
@@ -212,7 +235,7 @@ def extract(raw: dict, cfg: dict) -> dict:
 
     return {
         "model_key": model_key,
-        "model_name": cfg["models"].get(model_key, {}).get("name") if model_key else None,
+        "model_name": cfg["models"].get(model_key, {}).get("name") if model_key else cat_name,
         "year": year,
         "price": int(price) if price else None,
         "price_type": ptype,
