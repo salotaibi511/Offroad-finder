@@ -1,1 +1,44 @@
-{"updated_at": null, "listings": [], "stats": {}, "runs": []}
+{
+ "updated_at": "2026-11-06T19:40:19Z",
+ "listings": [],
+ "stats": {},
+ "runs": [
+  {
+   "trigger": "rescore",
+   "at": "2026-11-06T19:40:19Z",
+   "added": 0,
+   "updated": 0,
+   "notified": 0
+  }
+ ],
+ "stats_names": {
+  "land_cruiser": "تويوتا لاندكروزر",
+  "lc70": "تويوتا شاص/ربع (70)",
+  "prado": "تويوتا برادو",
+  "fj": "تويوتا اف جي",
+  "hilux": "تويوتا هايلكس",
+  "fourrunner": "تويوتا فورنر",
+  "patrol": "نيسان باترول",
+  "nissan_pickup": "نيسان دبل/نافارا",
+  "pajero": "ميتسوبيشي باجيرو",
+  "l200": "ميتسوبيشي L200",
+  "jimny": "سوزوكي جمني",
+  "vitara": "سوزوكي فيتارا",
+  "wrangler": "جيب رانجلر",
+  "cherokee": "جيب شيروكي",
+  "dmax": "ايسوزو ديماكس",
+  "ranger": "فورد رينجر",
+  "lexus_lx_gx": "لكزس LX/GX",
+  "tahoe_yukon": "تاهو/يوكن/سوبربان"
+ },
+ "requirements": {
+  "max_price": 20000,
+  "min_year": 1990,
+  "good_mileage_km": 250000,
+  "max_mileage_km": 450000,
+  "require_4x4": true,
+  "exclude_parts_cars": true,
+  "home_city": "جدة",
+  "min_plausible_price": 5000
+ }
+}
