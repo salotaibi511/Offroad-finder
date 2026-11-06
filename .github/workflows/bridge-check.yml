@@ -1,0 +1,16 @@
+name: فحص الجسر
+
+on:
+  workflow_dispatch: {}
+
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    steps:
+      - run: |
+          U="https://script.google.com/macros/s/AKfycby-O7s8Z2iBiNa5yfAPUw_KiQBlq8O2OJN_omxcWNxm0Sy9TgqNGZrq6b7clZsPRcyz/exec"
+          echo "== ping";   curl -sL "$U?action=ping" | head -c 300; echo
+          echo "== status"; curl -sL "$U?action=status" | head -c 400; echo
+          echo "== edits";  curl -sL "$U?action=edits" | head -c 300; echo
+          echo "== data";   curl -sL "$U?action=data" | head -c 200; echo
+          echo "== cors";   curl -sIL -X POST -H "Origin: https://salotaibi511.github.io" --data '{"action":"ping"}' "$U" | grep -i "access-control\|HTTP/" 
