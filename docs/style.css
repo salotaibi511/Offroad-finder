@@ -98,3 +98,12 @@ dialog h3{margin-top:0}
 .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:4px 12px}
 .form-grid .wide{grid-column:1/-1}
 dialog label.chk{flex-direction:row;align-items:center;color:var(--ink)}
+
+.btn.like.on{background:#fde8e8;border-color:#f3b4b4}
+.likers{font-size:13px;background:#fff1f1;border-radius:8px;padding:5px 8px;color:#7a2e2e}
+.fav-list{display:flex;flex-direction:column;gap:8px;max-width:900px}
+.fav-row{display:flex;gap:12px;align-items:center;background:var(--card);border:1px solid var(--line);border-radius:12px;padding:10px 12px}
+.fav-main{flex:1;min-width:0}
+.fav-main a{text-decoration:none;color:var(--ink)}
+.score.sm{position:static;width:40px;height:40px;font-size:15px;flex:none}
+.members{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:12px}

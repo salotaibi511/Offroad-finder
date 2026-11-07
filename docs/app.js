@@ -72,6 +72,7 @@ function applyEdits() {
     if (o.status) l.status = o.status;
     if (o.notes) l.web_notes = o.notes;
     if (o.hidden) l._hidden = true;
+    if (o.likes && Object.keys(o.likes).length) l.likes = o.likes;
     if (Object.keys(o.fields || {}).length) l.edited = { by: o.by, at: o.at };
     return l;
   }).filter((l) => !l._hidden);
@@ -118,7 +119,7 @@ function refreshFilterOptions() {
 function initFilters() {
   refreshFilterOptions();
   $("#f-status").innerHTML = `<option value="">كل الحالات</option>` + STATUSES.map((s) => `<option>${s}</option>`).join("");
-  ["#f-q", "#f-model", "#f-region", "#f-dist", "#f-status", "#f-sort", "#f-all"].forEach((s) => $(s).addEventListener("input", render));
+  ["#f-q", "#f-model", "#f-region", "#f-dist", "#f-status", "#f-sort", "#f-all", "#f-fav"].forEach((s) => $(s).addEventListener("input", render));
   const chips = Object.keys(LABELS).filter((l) => l !== "مغلق");
   $("#label-chips").innerHTML = chips.map((l) => `<button class="chip ${activeLabels.has(l) ? "on" : ""}" data-l="${l}">${l}</button>`).join("");
   $("#label-chips").onclick = (e) => {
@@ -144,7 +145,9 @@ function initFilters() {
 function filtered() {
   const q = $("#f-q").value.trim(), model = $("#f-model").value, region = $("#f-region").value;
   const dist = +$("#f-dist").value || 0, st = $("#f-status").value, all = $("#f-all").checked, sort = $("#f-sort").value;
+  const favOnly = $("#f-fav").checked;
   const xs = DB.listings.filter((l) => {
+    if (favOnly) return likeCount(l) > 0 && (!q || `${l.title} ${l.body} ${l.city}`.includes(q));
     if (!all && (l.archived || l.label === "مستبعد" || l.label === "مغلق")) return false;
     if (activeLabels.size && !activeLabels.has(l.label) && !(all && (l.label === "مستبعد" || l.label === "مغلق"))) return false;
     if (model && l.model_name !== model) return false;
@@ -156,6 +159,7 @@ function filtered() {
   });
   const key = {
     score: (a, b) => b.score - a.score,
+    likes: (a, b) => likeCount(b) - likeCount(a) || b.score - a.score,
     new: (a, b) => (b.first_seen || "").localeCompare(a.first_seen || ""),
     price: (a, b) => (a.price ?? 1e9) - (b.price ?? 1e9),
     km: (a, b) => (a.mileage_km ?? 1e9) - (b.mileage_km ?? 1e9),
@@ -175,6 +179,11 @@ function card(l) {
     ...(l.reasons_neg || []).slice(0, 3).map((r) => `<li class="neg">! ${esc(r)}</li>`),
   ].join("");
   const bars = Object.entries(l.breakdown || {}).map(([k, v]) => `<span>${BREAK[k] || k}</span><div class="bar"><i style="width:${v}%"></i></div>`).join("");
+  const likers = Object.entries(l.likes || {});
+  const me = store.get("offroad_name");
+  const iLike = !!(l.likes && me && l.likes[me]);
+  const likeLine = likers.length ? `<div class="likers">❤️ ${likers.map(([n, v]) => `<b>${esc(n)}</b>${v.note ? `: ${esc(v.note)}` : ""}`).join(" · ")}</div>` : "";
+  const likeBtn = API ? `<button class="btn sm like ${iLike ? "on" : ""}" data-like="${esc(l.id)}" title="${iLike ? "إلغاء الإعجاب" : "أعجبني"}">${iLike ? "❤️" : "🤍"} ${likers.length || ""}</button>` : (likers.length ? `<span class="btn sm like">❤️ ${likers.length}</span>` : "");
   const notes = [...(l.notes || []), ...(l.web_notes || [])].map((n) => `<div>📝 <b>${esc(n.by)}</b> (${esc(n.date)}): ${esc(n.text)}</div>`).join("");
   const ph = (l.price_history || []).length > 1 ? `<div class="meta">تاريخ السعر: ${l.price_history.map((p) => fmt(p.price)).join(" ← ")}</div>` : "";
   const statusCtl = API
@@ -202,11 +211,13 @@ function card(l) {
       <ul class="reasons">${reasons}</ul>
       <details><summary>تفصيل الدرجة والوصف</summary><div class="bars">${bars}</div><p class="muted">${esc(l.body || "")}</p></details>
       ${ph}
+      ${likeLine}
       ${notes ? `<div class="notes">${notes}</div>` : ""}
       <div class="meta">${statusCtl}<span>${esc(l.source)} · ${ago(l.first_seen)}${l.added_by && l.added_by !== "auto" ? " · أضافه " + esc(String(l.added_by).replace("auto+", "")) : ""}${l.edited ? ` · ✏️ عدّله ${esc(l.edited.by)}` : ""}</span></div>
     </div>
     <div class="cardfoot">
       <a class="btn sm primary" href="${esc(l.url)}" target="_blank">فتح الإعلان</a>
+      ${likeBtn}
       ${editBtn}
       <button class="btn sm" data-msg="${esc(l.id)}">رسالة للبائع</button>
     </div></article>`;
@@ -224,7 +235,32 @@ function render() {
   $("#list").innerHTML = pendingCards() + xs.map(card).join("");
   $("#empty").classList.toggle("hidden", xs.length > 0);
   $("#empty").textContent = DB.listings.length ? "لا توجد عروض مطابقة للفلاتر." : "لا توجد عروض بعد. اضغط «تحديث» أو «أضف عرض».";
-  renderTiles(); renderBoard(); renderMarket();
+  renderTiles(); renderBoard(); renderMarket(); renderFavs();
+}
+
+function likeCount(l) { return Object.keys(l.likes || {}).length; }
+
+function renderFavs() {
+  const liked = DB.listings.filter((l) => likeCount(l) > 0).sort((a, b) => likeCount(b) - likeCount(a) || b.score - a.score);
+  $("#fav-count").textContent = liked.length ? `(${liked.length})` : "";
+  if (!liked.length) {
+    $("#favs").innerHTML = `<p class="empty">لا توجد عروض في المفضلة بعد. اضغط 🤍 على أي عرض يعجبك ليظهر هنا للجميع.</p>`;
+    return;
+  }
+  const members = {};
+  liked.forEach((l) => Object.keys(l.likes).forEach((n) => (members[n] = members[n] || []).push(l)));
+  const row = (l) => `<div class="fav-row">
+      <div class="score sm" style="background:${scoreColor(l.score)}">${l.score}</div>
+      <div class="fav-main">
+        <a href="${esc(l.url)}" target="_blank"><b>${esc(l.title)}</b></a>
+        <div class="muted">${l.price ? fmt(l.price) + " ريال" : "السعر ؟"} · ${esc(l.model_name || "")} ${l.year || ""} · ${l.mileage_km ? fmt(l.mileage_km) + " كم" : "ممشى ؟"} · 📍 ${esc(l.city || "؟")} · <span class="status">${esc(l.status)}</span></div>
+        <div class="likers">❤️ ${Object.entries(l.likes).map(([n, v]) => `<b>${esc(n)}</b>${v.note ? `: ${esc(v.note)}` : ""}`).join(" · ")}</div>
+      </div>
+      ${API ? `<button class="btn sm like ${l.likes[store.get("offroad_name")] ? "on" : ""}" data-like="${esc(l.id)}">${l.likes[store.get("offroad_name")] ? "❤️" : "🤍"} ${likeCount(l)}</button>` : `<span class="btn sm">❤️ ${likeCount(l)}</span>`}
+    </div>`;
+  $("#favs").innerHTML = `<h3>الأكثر إعجابًا</h3><div class="fav-list">${liked.map(row).join("")}</div>
+    <h3>قائمة كل عضو</h3><div class="members">${Object.entries(members).sort((a, b) => b[1].length - a[1].length).map(([n, xs]) =>
+      `<div class="col"><h4>${esc(n)} (${xs.length})</h4>${xs.map((l) => `<div class="mini"><b>${l.score}</b> · <a href="${esc(l.url)}" target="_blank">${esc(l.title)}</a><br>${l.price ? fmt(l.price) + " ريال" : ""} ${esc(l.city || "")}${l.likes[n].note ? `<br>💬 ${esc(l.likes[n].note)}` : ""}</div>`).join("")}</div>`).join("")}</div>`;
 }
 
 function renderTiles() {
@@ -235,12 +271,14 @@ function renderTiles() {
     ["🟡 تستحق السؤال", c((l) => l.label === "يستحق السؤال"), "يستحق السؤال"],
     ["⚪ ضعيفة", c((l) => l.label === "ضعيف"), "ضعيف"],
     ["⛔ خارج المواصفات", c((l) => l.label === "مستبعد"), "مستبعد"],
+    ["❤️ في المفضلة", c((l) => likeCount(l) > 0), "__fav"],
     ["📌 قيد المتابعة", c((l) => !["جديد", "مستبعد يدويًا"].includes(l.status)), null],
-    ["🆕 آخر 24 ساعة", c((l) => Date.now() - new Date(l.first_seen) < 864e5), null],
+
   ];
   $("#tiles").innerHTML = tiles.map(([t, n, l]) => `<div class="tile" ${l ? `data-l="${l}"` : ""}><b>${n}</b><span>${t}</span></div>`).join("");
   $("#tiles").onclick = (e) => {
     const l = e.target.closest(".tile")?.dataset.l; if (!l) return;
+    if (l === "__fav") return document.querySelector('.tab[data-tab="favs"]').click();
     activeLabels = new Set([l]);
     if (l === "مستبعد") $("#f-all").checked = true;
     document.querySelectorAll(".chip").forEach((c) => c.classList.toggle("on", activeLabels.has(c.dataset.l)));
@@ -362,6 +400,32 @@ async function quickStatus(id, status) {
   } catch (err) { toast("تعذر الحفظ: " + err.message, "err"); render(); }
 }
 
+/* ---------------- likes ---------------- */
+let liking = null;
+async function toggleLike(id) {
+  const l = DB.listings.find((x) => x.id === id); if (!l) return;
+  const me = askName();
+  if (me === "زائر") { toast("اكتب اسمك أولًا حتى يعرف الأعضاء من أعجبه العرض", "err"); return; }
+  if (l.likes && l.likes[me]) {
+    if (!confirm("إلغاء إعجابك بهذا العرض؟")) return;
+    return saveLike(id, false, "");
+  }
+  liking = id;
+  $("#like-title").textContent = l.title;
+  $("#like-note").value = "";
+  $("#like-dlg").showModal();
+}
+async function saveLike(id, liked, note) {
+  try {
+    const j = await api("like", { id, liked, note });
+    EDITS.overrides[id] = { ...(EDITS.overrides[id] || {}), likes: j.likes };
+    applyEdits(); render();
+    toast(liked ? "❤️ أُضيف للمفضلة — يراه كل الأعضاء" : "أُزيل من مفضلتك", "ok");
+  } catch (err) {
+    toast(/غير معروف/.test(err.message) ? "يلزم تحديث كود الجسر في Google لتفعيل الإعجاب" : "تعذر الحفظ: " + err.message, "err");
+  }
+}
+
 /* ---------------- refresh (search now) ---------------- */
 async function runRefresh() {
   try {
@@ -422,8 +486,9 @@ function sellerMessage(l) {
 
 /* ---------------- events ---------------- */
 document.addEventListener("click", (e) => {
-  const t = e.target.closest("[data-msg],[data-edit]"); if (!t) return;
+  const t = e.target.closest("[data-msg],[data-edit],[data-like]"); if (!t) return;
   if (t.dataset.edit) return openEdit(t.dataset.edit);
+  if (t.dataset.like) return toggleLike(t.dataset.like);
   const l = DB.listings.find((x) => x.id === t.dataset.msg);
   const txt = sellerMessage(l);
   $("#msg-text").value = txt;
@@ -436,6 +501,11 @@ document.addEventListener("change", (e) => {
 $("#msg-copy").onclick = () => { navigator.clipboard?.writeText($("#msg-text").value); $("#msg-copy").textContent = "تم النسخ ✓"; };
 $("#add-form").addEventListener("submit", submitAdd);
 $("#edit-form").addEventListener("submit", submitEdit);
+$("#like-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+  $("#like-dlg").close();
+  await saveLike(liking, true, $("#like-note").value.trim());
+});
 document.querySelectorAll("[data-close]").forEach((b) => (b.onclick = () => b.closest("dialog").close()));
 
 load(true);

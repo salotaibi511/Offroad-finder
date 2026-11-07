@@ -24,7 +24,7 @@ function doPost(e) {
 function handle_(p) {
   try {
     const props = PropertiesService.getScriptProperties();
-    const writes = ['add', 'edit', 'refresh'];
+    const writes = ['add', 'edit', 'refresh', 'like'];
     if (writes.indexOf(p.action) >= 0) {
       const code = props.getProperty('EDIT_CODE');
       if (code && String(p.code || '') !== code) return out_({ ok: false, error: 'رمز التعديل غير صحيح', need_code: true });
@@ -37,6 +37,7 @@ function handle_(p) {
       case 'add': return out_(add_(p));
       case 'edit': return out_(edit_(p));
       case 'refresh': dispatch_('collect.yml'); return out_({ ok: true });
+      case 'like': return out_(like_(p));
       default: return out_({ ok: false, error: 'طلب غير معروف' });
     }
   } catch (err) {
@@ -95,6 +96,24 @@ function edit_(p) {
   }, 'تعديل عرض من الموقع');
   dispatch_('api.yml');
   return { ok: true, override: result };
+}
+
+/** إعجاب/إلغاء إعجاب مع ملاحظة اختيارية — لا يحتاج إعادة تقييم فلا يشغّل GitHub Actions */
+function like_(p) {
+  const id = clean_(p.id, 80);
+  const by = clean_(p.by, 40);
+  if (!id) return { ok: false, error: 'رقم العرض مفقود' };
+  if (!by || by === 'زائر') return { ok: false, error: 'اكتب اسمك أولًا' };
+  let likes;
+  withEdits_(function (d) {
+    const ov = d.overrides[id] || {};
+    ov.likes = ov.likes || {};
+    if (p.liked === false || p.liked === 'false') delete ov.likes[by];
+    else ov.likes[by] = { at: now_(), note: clean_(p.note, 300) };
+    d.overrides[id] = ov;
+    likes = ov.likes;
+  }, (p.liked === false ? 'إلغاء إعجاب' : 'إعجاب') + ' من الموقع');
+  return { ok: true, likes: likes };
 }
 
 function runs_() {

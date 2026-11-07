@@ -29,6 +29,7 @@
 
 <div class="tabs" role="tablist">
   <button class="tab active" data-tab="offers">العروض</button>
+  <button class="tab" data-tab="favs">❤️ المفضلة <span id="fav-count"></span></button>
   <button class="tab" data-tab="pipeline">المتابعة</button>
   <button class="tab" data-tab="market">السوق</button>
 </div>
@@ -51,13 +52,17 @@
       <option value="price">الأقل سعرًا</option>
       <option value="km">الأقل ممشى</option>
       <option value="year">الأحدث موديلًا</option>
+      <option value="likes">الأكثر إعجابًا</option>
     </select>
+    <label class="chk"><input id="f-fav" type="checkbox"> ❤️ المفضلة فقط</label>
     <label class="chk"><input id="f-all" type="checkbox"> إظهار المستبعد والمؤرشف</label>
   </div>
   <div class="chips" id="label-chips"></div>
   <div id="list" class="grid"></div>
   <p id="empty" class="empty hidden"></p>
 </section>
+
+<section id="favs" class="panel"></section>
 
 <section id="pipeline" class="panel"><div id="board" class="board"></div></section>
 
@@ -102,6 +107,15 @@
       <label class="wide chk"><input type="checkbox" id="e-hide"> إخفاء هذا العرض نهائيًا (ليس سيارة / غير مناسب)</label>
     </div>
     <div class="row"><button class="btn primary" id="e-save" type="submit">حفظ</button><button class="btn" type="button" data-close>إلغاء</button></div>
+  </form>
+</dialog>
+
+<dialog id="like-dlg">
+  <form id="like-form">
+    <h3>❤️ أعجبني هذا العرض</h3>
+    <p class="muted" id="like-title"></p>
+    <label>ملاحظتك (اختياري — يراها كل الأعضاء)<textarea id="like-note" rows="3" placeholder="مثال: نظيفة وسعرها معقول، يستاهل نشوفها"></textarea></label>
+    <div class="row"><button class="btn primary" type="submit">أضف للمفضلة</button><button class="btn" type="button" data-close>إلغاء</button></div>
   </form>
 </dialog>
 
